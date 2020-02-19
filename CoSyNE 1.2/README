@@ -1,0 +1,76 @@
+README for Cooperative Synapse Neuroevolution (CoSyNE) 1.0
+Copyright (c) 2007 Faustino J. Gomez 
+
+
+_________________________________________________________
+COMPILING
+---------------------------------------------------------
+
+To compile use:
+
+> make cosyne-dpole  OPT=-Ox
+
+where x is the level of compiler optimization. For 
+debugging use OPT=-g .
+
+You will need to edit the makefile to set the
+path to your xerces-C++ XML parser library:
+
+XML_LIB = -L<your path>/xerces-c-src_2_XX_0/lib -lxerces-c
+CFLAGS += -I<your path>/xerces-c-src_2_XX_0/src
+
+If you do not have this library and do not plan to 
+install it, comment out the following line in the
+makefile.
+
+XML = -D_XML 
+
+The xerces parser handles the input of saved population 
+and network files to CoSyNE.  Without it you will have
+to implement your own routines to handle this.  Therefore, 
+the xerces-C++ parser is recommended, and available at:
+
+http://xml.apache.org/xerces-c/
+
+If you use xerces, make sure you do not delete cosyne.dtd
+and network.dtd which define the file format for the populations
+and networks, respectively.   
+
+__________________________________________________________
+RUNNING
+----------------------------------------------------------
+To run CoSyNE on the double pole-balancing problem first 
+try:
+
+> cosyne-dpole --help
+
+this will list all of the command line options for both 
+CoSyNE and the double pole environment.
+
+
+> cosyne-dpole -t 3 --nm  
+
+this will evolve a fully recurrent network (-t 3) for the 
+non-markov (--nm) version of the double pole problem with
+all other parameters:  -z number of neurons, -n size of 
+subpopulations, etc., set to their default values.  All
+of the parameter settings will be displayed when CoSyNE
+starts to run.  Once evolution starts, CoSyNE will 
+output the fitness of the best network for each
+generation ("best"), along with that of the best network during
+the current burst mutation phase ("task best"), and that of the 
+best network found so far ("overall best").
+
+To list the available network types:
+
+> cosyne-dpole --list
+
+
+__________________________________________________________
+
+To apply CoSyNE to a new problem, you just need to 
+implement your own derived environment class that 
+has an evalNet method that takes an object of type Network
+and returns an object of type Fitness.  There are other 
+virtual methods in the Environment class, but only evalNet must 
+be defined in the derived environment.

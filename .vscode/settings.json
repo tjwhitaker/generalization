@@ -1,0 +1,14 @@
+{
+  "files.associations": {
+    "CartPole.C": "cpp",
+    "CoSyNE.C": "cpp",
+    "Environment.C": "cpp",
+    "FeedForwardNetwork.C": "cpp",
+    "FullyRecurrentNetwork.C": "cpp",
+    "LinearRecurrentNetwork.C": "cpp",
+    "LSTMNetwork.C": "cpp",
+    "main-cosyne.C": "cpp",
+    "SimpleRecurrentNetwork.C": "cpp",
+    "SingleLayerFeedForwardNetwork.C": "cpp"
+  }
+}
