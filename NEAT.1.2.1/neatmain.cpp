@@ -35,7 +35,6 @@
 #include "experiments.h"
 using namespace std;
 
-
 //  double testdoubval() {
 //    return *testdoub;
 //  }
@@ -44,34 +43,36 @@ using namespace std;
 //    *testdoub=val;
 //  }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 
   //list<NNode*> nodelist;
 
   int pause;
 
-  NEAT::Population *p=0;
+  NEAT::Population *p = 0;
 
   /* GTKMM */
-//    myapp=new Gtk::Main(argc, argv);
+  //    myapp=new Gtk::Main(argc, argv);
 
-//    testdoub=&val;
+  //    testdoub=&val;
 
   //***********RANDOM SETUP***************//
   /* Seed the random-number generator with current time so that
       the numbers will be different every time we run.    */
-  srand( (unsigned)time( NULL ) );
+  srand((unsigned)time(NULL));
 
-  if (argc != 2) {
+  if (argc != 2)
+  {
     cerr << "A NEAT parameters file (.ne file) is required to run the experiments!" << endl;
     return -1;
   }
 
   //Load in the params
-  NEAT::load_neat_params(argv[1],true);
+  NEAT::load_neat_params(argv[1], true);
 
-  cout<<"loaded"<<endl;
-  
+  cout << "loaded" << endl;
+
   /*
   //Test a genome file on pole balancing
   Genome *g;
@@ -88,41 +89,41 @@ int main(int argc, char *argv[]) {
   cin>>pause;
   */
 
-
   //Here is an example of how to run an experiment directly from main
   //and then visualize the speciation that took place
 
   //p=xor_test(100);  //100 generation XOR experiment
 
-  int choice;
+  // int choice;
 
-  cout<<"Please choose an experiment: "<<endl;
-  cout<<"1 - 1-pole balancing"<<endl;
-  cout<<"2 - 2-pole balancing, velocity info provided"<<endl;
-  cout<<"3 - 2-pole balancing, no velocity info provided (non-markov)"<<endl;
-  cout<<"4 - XOR"<<endl;
-  cout<<"Number: ";
+  // cout<<"Please choose an experiment: "<<endl;
+  // cout<<"1 - 1-pole balancing"<<endl;
+  // cout<<"2 - 2-pole balancing, velocity info provided"<<endl;
+  // cout<<"3 - 2-pole balancing, no velocity info provided (non-markov)"<<endl;
+  // cout<<"4 - XOR"<<endl;
+  // cout<<"Number: ";
 
-  cin>>choice;
+  // cin>>choice;
 
-  switch ( choice )
-    {
-    case 1:
-      p = pole1_test(100);
-      break;
-    case 2:
-      p = pole2_test(100,1);
-      break;
-    case 3:
-      p = pole2_test(100,0);
-      break;
-    case 4:
-      p=xor_test(100);
-      break;
-    default:
-      cout<<"Not an available option."<<endl;
-    }
+  int choice = 3;
 
+  switch (choice)
+  {
+  case 1:
+    p = pole1_test(100);
+    break;
+  case 2:
+    p = pole2_test(100, 1);
+    break;
+  case 3:
+    p = pole2_test(100, 0);
+    break;
+  case 4:
+    p = xor_test(100);
+    break;
+  default:
+    cout << "Not an available option." << endl;
+  }
 
   //p = pole1_test(100); // 1-pole balancing
   //p = pole2_test(100,1); // 2-pole balancing, velocity
@@ -131,7 +132,5 @@ int main(int argc, char *argv[]) {
   if (p)
     delete p;
 
-  return(0);
- 
+  return (0);
 }
-
