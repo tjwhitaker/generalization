@@ -1,2 +1,43 @@
-*.o
+# Data folders to keep track of weights + matlab code
+data/
+results/
+
+# Executables and results
+NNcommitteee
+nkdynpe
+nnet2nke
+nnetRes_1_reg.txt
 gen_*
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
