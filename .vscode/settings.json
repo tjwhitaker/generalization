@@ -9,6 +9,11 @@
     "LSTMNetwork.C": "cpp",
     "main-cosyne.C": "cpp",
     "SimpleRecurrentNetwork.C": "cpp",
-    "SingleLayerFeedForwardNetwork.C": "cpp"
+    "SingleLayerFeedForwardNetwork.C": "cpp",
+    "genNet.C": "cpp",
+    "main-esp.C": "cpp",
+    "CoSyNE_SAX_Handlers.C": "cpp",
+    "iosfwd": "cpp",
+    "ostream": "cpp"
   }
 }
