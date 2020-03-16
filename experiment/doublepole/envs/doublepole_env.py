@@ -56,6 +56,8 @@ class DoublePoleEnv(gym.Env):
     self.state = np.zeros(6)
     self.dstate = np.zeros(6)
 
+    self.viewer = None
+
   def dynamic_system(self, force, state, dstate):
     pole_1_cos_theta = cos(state[2])
     pole_1_sin_theta = sin(state[2])
@@ -72,7 +74,7 @@ class DoublePoleEnv(gym.Env):
     dstate[3] = -0.75 * (dstate[1] * pole_1_cos_theta + self.gravity * pole_1_sin_theta + (self.pole_friction * state[3]) / (self.pole_1_mass * self.pole_1_length)) / self.pole_1_length
     dstate[5] = -0.75 * (dstate[1] * pole_2_cos_theta + self.gravity * pole_2_sin_theta + (self.pole_friction * state[5]) / (self.pole_2_mass * self.pole_2_length)) / self.pole_2_length
 
-  def runge_kutta_4th(self, force, state, dstate):
+  def runge_kutta(self, force, state, dstate):
     u1 = u2 = u3 = u4 = [0,0,0,0,0,0]
     state_temp = dstate_temp = [0,0,0,0,0,0]
 
@@ -131,8 +133,8 @@ class DoublePoleEnv(gym.Env):
     # Change state
     # runge_kutta(action, self.state, self.dstate)
     # return np.array(self.state), reward, done, {}
-    print(action, self.state)
-    self.runge_kutta_4th(action, self.state, self.dstate)
+    self.runge_kutta(action, self.state, self.dstate)
+    print(self.state, self.dstate)
 
     return np.array(self.state), 1, False, {}
 
@@ -142,4 +144,59 @@ class DoublePoleEnv(gym.Env):
     self.state = np.array([0, 0, 4.5 * (2*np.pi) / 360, 0, 0, 0])
 
   def render(self, mode='human'):
-    pass
+    screen_width = 600
+    screen_height = 400
+
+    world_width = self.max_position*2
+    scale = screen_width/world_width
+    carty = 100 # TOP OF CART
+    polewidth = 10.0
+    polelen = scale * self.pole_1_length
+    cartwidth = 50.0
+    cartheight = 30.0
+
+    if self.viewer is None:
+      from gym.envs.classic_control import rendering
+      self.viewer = rendering.Viewer(screen_width, screen_height)
+      l,r,t,b = -cartwidth/2, cartwidth/2, cartheight/2, -cartheight/2
+      axleoffset =cartheight/4.0
+      cart = rendering.FilledPolygon([(l,b), (l,t), (r,t), (r,b)])
+      self.carttrans = rendering.Transform()
+      cart.add_attr(self.carttrans)
+      self.viewer.add_geom(cart)
+      l,r,t,b = -polewidth/2,polewidth/2,polelen-polewidth/2,-polewidth/2
+      pole = rendering.FilledPolygon([(l,b), (l,t), (r,t), (r,b)])
+      pole.set_color(.8,.6,.4)
+      self.poletrans = rendering.Transform(translation=(0, axleoffset))
+      pole.add_attr(self.poletrans)
+      pole.add_attr(self.carttrans)
+      self.viewer.add_geom(pole)
+      self.axle = rendering.make_circle(polewidth/2)
+      self.axle.add_attr(self.poletrans)
+      self.axle.add_attr(self.carttrans)
+      self.axle.set_color(.5,.5,.8)
+      self.viewer.add_geom(self.axle)
+      self.track = rendering.Line((0,carty), (screen_width,carty))
+      self.track.set_color(0,0,0)
+      self.viewer.add_geom(self.track)
+
+      self._pole_geom = pole
+
+    if self.state is None: return None
+
+    # Edit the pole polygon vertex
+    pole = self._pole_geom
+    l,r,t,b = -polewidth/2,polewidth/2,polelen-polewidth/2,-polewidth/2
+    pole.v = [(l,b), (l,t), (r,t), (r,b)]
+
+    x = self.state
+    cartx = x[0]*scale+screen_width/2.0 # MIDDLE OF CART
+    self.carttrans.set_translation(cartx, carty)
+    self.poletrans.set_rotation(-x[2])
+
+    return self.viewer.render(return_rgb_array = mode=='rgb_array')
+
+  def close(self):
+    if self.viewer:
+      self.viewer.close()
+      self.viewer = None
