@@ -11,7 +11,8 @@
 #define CHAR_L 1000
 #define pi 3.1415926535897932384626433832795
 
-class nnet {
+class nnet
+{
 private:
   double **W_in;  // weight matrix between input and hidden layer 1 (reservoir)
   double **W;     // weight matrix for the recurrent connections in the reservoir (hidden layer 2)
@@ -21,7 +22,8 @@ private:
   int n_hid1;     // number of neurons in the hidden layer 1 (reservoir)
   int n_hid2;     // number of neurons in the hidden layer 2
   int n_out;      // number of neurons in the output layer
-  typedef struct {
+  typedef struct
+  {
     double bias;                                                            // bias
     int n_inputs;                                                           // number of inputs for the neuron
     int *inputs;                                                            // vector with the indices of the input neurons connected to this neuron
@@ -44,7 +46,8 @@ public:
 /******************************************************************************\
 *								Constructor													   *
 \******************************************************************************/
-nnet::nnet(int n_inp_par, int n_hid_par, int n_out_par, double con_density, double spectral_radius_d, int res_size, int **M_out) {
+nnet::nnet(int n_inp_par, int n_hid_par, int n_out_par, double con_density, double spectral_radius_d, int res_size, int **M_out)
+{
   int i, j, k, k_start, k_end, size_W, k1, k2;
   double spectral_radius, **W_temp, min_W = -0.6, max_W = 0.6;
 
@@ -63,13 +66,15 @@ nnet::nnet(int n_inp_par, int n_hid_par, int n_out_par, double con_density, doub
   out_neurons = new neuron[n_out];
 
   // Neurons - Hidden Layer 1
-  for (i = 0; i < n_hid1; i++) {
+  for (i = 0; i < n_hid1; i++)
+  {
     // Inputs
     hid1_neurons[i].n_inputs = n_inp;
     hid1_neurons[i].inputs = aloc_vectori(hid1_neurons[i].n_inputs);
     hid1_neurons[i].bias = (max_W - min_W) * random_dou() + min_W; // random number between min_W and max_W
 
-    for (j = 0; j < n_inp; j++) {
+    for (j = 0; j < n_inp; j++)
+    {
       hid1_neurons[i].inputs[j] = j;
       W_in[i][j] = (max_W - min_W) * random_dou() + min_W; // random number between min_W and max_W
     }
@@ -78,7 +83,8 @@ nnet::nnet(int n_inp_par, int n_hid_par, int n_out_par, double con_density, doub
     hid1_neurons[i].rec = aloc_vectori(n_hid1);
     hid1_neurons[i].n_rec = 0;
 
-    for (j = 0; j < n_hid1; j++) {
+    for (j = 0; j < n_hid1; j++)
+    {
       W[i][j] = 0.0;
     }
   }
@@ -87,26 +93,32 @@ nnet::nnet(int n_inp_par, int n_hid_par, int n_out_par, double con_density, doub
   k_start = 0;
   k_end = res_size - 1;
 
-  if (k_end > n_hid1 - 1) {
+  if (k_end > n_hid1 - 1)
+  {
     k_end = n_hid1 - 1;
   }
 
   n_res = 1;
 
-  for (i = 0; i < n_hid1; i++) {
-    if (i > k_end) {
+  for (i = 0; i < n_hid1; i++)
+  {
+    if (i > k_end)
+    {
       k_start = i;
       k_end = k_start + res_size - 1;
 
-      if (k_end > n_hid1 - 1) {
+      if (k_end > n_hid1 - 1)
+      {
         k_end = n_hid1 - 1;
       }
 
       n_res++;
     }
 
-    for (j = k_start; j <= k_end; j++) {
-      if (random_dou() < con_density) {
+    for (j = k_start; j <= k_end; j++)
+    {
+      if (random_dou() < con_density)
+      {
         hid1_neurons[i].rec[hid1_neurons[i].n_rec] = j;
         hid1_neurons[i].n_rec = hid1_neurons[i].n_rec + 1;
         W[i][j] = (max_W - min_W) * random_dou() + min_W; // random number between min_W and max_W
@@ -118,18 +130,22 @@ nnet::nnet(int n_inp_par, int n_hid_par, int n_out_par, double con_density, doub
   k_start = 0;
   k_end = res_size - 1;
 
-  if (k_end > n_hid1 - 1) {
+  if (k_end > n_hid1 - 1)
+  {
     k_end = n_hid1 - 1;
   }
 
-  for (k = 0; k < n_res; k++) {
+  for (k = 0; k < n_res; k++)
+  {
     // W_temp: W for reservoir k
     size_W = k_end - k_start + 1;
     W_temp = aloc_matrixd(size_W, size_W);
     i = 0;
-    for (k1 = k_start; k1 <= k_end; k1++) {
+    for (k1 = k_start; k1 <= k_end; k1++)
+    {
       j = 0;
-      for (k2 = k_start; k2 <= k_end; k2++) {
+      for (k2 = k_start; k2 <= k_end; k2++)
+      {
         W_temp[i][j] = W[k1][k2];
         j++;
       }
@@ -140,16 +156,20 @@ nnet::nnet(int n_inp_par, int n_hid_par, int n_out_par, double con_density, doub
     spectral_radius = largEig(W_temp, size_W, size_W);
 
     // Normalizing W to desired spectral radius (Scaling W to spectral_radius_d (1/spectral_radius) W)
-    for (i = 0; i < size_W; i++) {
-      for (j = 0; j < size_W; j++) {
+    for (i = 0; i < size_W; i++)
+    {
+      for (j = 0; j < size_W; j++)
+      {
         W_temp[i][j] = spectral_radius_d * W_temp[i][j] / spectral_radius;
       }
     }
 
     i = 0;
-    for (k1 = k_start; k1 <= k_end; k1++) {
+    for (k1 = k_start; k1 <= k_end; k1++)
+    {
       j = 0;
-      for (k2 = k_start; k2 <= k_end; k2++) {
+      for (k2 = k_start; k2 <= k_end; k2++)
+      {
         W[k1][k2] = W_temp[i][j];
         j++;
       }
@@ -159,7 +179,8 @@ nnet::nnet(int n_inp_par, int n_hid_par, int n_out_par, double con_density, doub
     k_start = k_end + 1;
     k_end = k_start + res_size - 1;
 
-    if (k_end > n_hid1 - 1) {
+    if (k_end > n_hid1 - 1)
+    {
       k_end = n_hid1 - 1;
     }
 
@@ -167,13 +188,15 @@ nnet::nnet(int n_inp_par, int n_hid_par, int n_out_par, double con_density, doub
   }
 
   // Neurons - Hidden Layer 2
-  for (i = 0; i < n_hid2; i++) {
+  for (i = 0; i < n_hid2; i++)
+  {
     hid2_neurons[i].n_inputs = 0;
     hid2_neurons[i].inputs = aloc_vectori(n_hid1);
     hid2_neurons[i].n_rec = 0;
     hid2_neurons[i].bias = (max_W - min_W) * random_dou() + min_W; // random number between min_W and max_W
 
-    for (j = 0; j < n_hid1; j++) {
+    for (j = 0; j < n_hid1; j++)
+    {
       hid2_neurons[i].inputs[hid2_neurons[i].n_inputs] = j;
       hid2_neurons[i].n_inputs = hid2_neurons[i].n_inputs + 1;
       W_hid[i][j] = (max_W - min_W) * random_dou() + min_W; // random number between min_W and max_W
@@ -181,20 +204,25 @@ nnet::nnet(int n_inp_par, int n_hid_par, int n_out_par, double con_density, doub
   }
 
   // Neurons - Output Layer (remember that the bias of each output neuron is given by the nk model
-  for (i = 0; i < n_out; i++) {
-    for (j = 0; j < n_hid2; j++) {
+  for (i = 0; i < n_out; i++)
+  {
+    for (j = 0; j < n_hid2; j++)
+    {
       W_out[i][j] = 0.0;
     }
   }
 
-  for (i = 0; i < n_out; i++) {
+  for (i = 0; i < n_out; i++)
+  {
     out_neurons[i].n_inputs = 0;
     out_neurons[i].inputs = aloc_vectori(n_hid2);
     out_neurons[i].n_rec = 0;
     out_neurons[i].bias = (max_W - min_W) * random_dou() + min_W; // random number between min_W and max_W
 
-    for (j = 0; j < n_hid2; j++) {
-      if (M_out[i][j] == 1) {
+    for (j = 0; j < n_hid2; j++)
+    {
+      if (M_out[i][j] == 1)
+      {
         out_neurons[i].inputs[out_neurons[i].n_inputs] = j;
         out_neurons[i].n_inputs = out_neurons[i].n_inputs + 1;
         W_out[i][j] = (max_W - min_W) * random_dou() + min_W; // random number between min_W and max_W
@@ -206,7 +234,8 @@ nnet::nnet(int n_inp_par, int n_hid_par, int n_out_par, double con_density, doub
 /******************************************************************************\
 *								 Destructor													   *
 \******************************************************************************/
-nnet::~nnet(void) {
+nnet::~nnet(void)
+{
   int i;
 
   desaloc_matrixd(W_in, n_hid1);
@@ -214,20 +243,23 @@ nnet::~nnet(void) {
   desaloc_matrixd(W_hid, n_hid2);
   desaloc_matrixd(W_out, n_out);
 
-  for (i = 0; i < n_hid1; i++) {
+  for (i = 0; i < n_hid1; i++)
+  {
     delete[] hid1_neurons[i].inputs;
     delete[] hid1_neurons[i].rec;
   }
 
   delete[] hid1_neurons;
 
-  for (i = 0; i < n_hid2; i++) {
+  for (i = 0; i < n_hid2; i++)
+  {
     delete[] hid2_neurons[i].inputs;
   }
 
   delete[] hid2_neurons;
 
-  for (i = 0; i < n_out; i++) {
+  for (i = 0; i < n_out; i++)
+  {
     delete[] out_neurons[i].inputs;
   }
 
@@ -237,21 +269,25 @@ nnet::~nnet(void) {
 /******************************************************************************\
 *					 Output of the Neural netwok (y) for input u and sol. x			   *
 \******************************************************************************/
-void nnet::output_nnet(double *u, double *z_old, double *z, double *y, int *x) {
+void nnet::output_nnet(double *u, double *z_old, double *z, double *y, int *x)
+{
   int i, j;
   double *s, sum_u;
 
   s = aloc_vectord(n_hid2); // outputs of the hidden layer 2
 
   // Activation of the neurons in the hidden layer 1 (reservoir)
-  for (i = 0; i < n_hid1; i++) {
+  for (i = 0; i < n_hid1; i++)
+  {
     sum_u = hid1_neurons[i].bias;
 
-    for (j = 0; j < n_inp; j++) {
+    for (j = 0; j < n_inp; j++)
+    {
       sum_u = sum_u + u[j] * W_in[i][j];
     }
 
-    for (j = 0; j < hid1_neurons[i].n_rec; j++) {
+    for (j = 0; j < hid1_neurons[i].n_rec; j++)
+    {
       sum_u = sum_u + z_old[hid1_neurons[i].rec[j]] * W[i][hid1_neurons[i].rec[j]];
     }
 
@@ -259,25 +295,32 @@ void nnet::output_nnet(double *u, double *z_old, double *z, double *y, int *x) {
   }
 
   // Activation of the neurons in the hidden layer 2
-  for (i = 0; i < n_hid2; i++) {
+  for (i = 0; i < n_hid2; i++)
+  {
     sum_u = hid2_neurons[i].bias;
 
-    for (j = 0; j < n_hid1; j++) {
+    for (j = 0; j < n_hid1; j++)
+    {
       sum_u = sum_u + z[hid2_neurons[i].inputs[j]] * W_hid[i][hid2_neurons[i].inputs[j]];
     }
 
-    if (x[i] == 0) {
+    if (x[i] == 0)
+    {
       s[i] = 0.0 * tanh(1.0 * sum_u); // Tangent hiperbolic with half-slope 1 and input sum_u; obs.: in the original tanh, a=1
-    } else {
+    }
+    else
+    {
       s[i] = tanh(1.0 * sum_u); // Tangent hiperbolic with half-slope 3 and input sum_u; obs.: in the original tanh, a=3
     }
   }
 
   // Activation of the output units
-  for (i = 0; i < n_out; i++) {
+  for (i = 0; i < n_out; i++)
+  {
     sum_u = out_neurons[i].bias;
 
-    for (j = 0; j < out_neurons[i].n_inputs; j++) {
+    for (j = 0; j < out_neurons[i].n_inputs; j++)
+    {
       sum_u = sum_u + s[out_neurons[i].inputs[j]] * W_out[i][out_neurons[i].inputs[j]];
     }
 
@@ -290,7 +333,8 @@ void nnet::output_nnet(double *u, double *z_old, double *z, double *y, int *x) {
 /******************************************************************************\
 *	Evaluation of the k-th output of the esn with sol. defined by j		        *
 \******************************************************************************/
-double nnet::eval(int k, int j) {
+double nnet::eval(int k, int j)
+{
   int i, t, *sol, *sol_reduced;
   double st[6], max_teta, max_x, fit = 0.0, *z, *z_init, *z_old, *y, u[3], F, fit_stable, sum_fst, f_cheap, *fst;
   doublePole *Pole; // declaring Inverted Double Pole class variable
@@ -311,29 +355,35 @@ double nnet::eval(int k, int j) {
   // Solution
   dec2binvec(j, sol_reduced, out_neurons[k].n_inputs);
 
-  for (i = 0; i < n_hid2; i++) {
+  for (i = 0; i < n_hid2; i++)
+  {
     sol[i] = 0;
   }
 
-  for (i = 0; i < out_neurons[k].n_inputs; i++) {
+  for (i = 0; i < out_neurons[k].n_inputs; i++)
+  {
     sol[out_neurons[k].inputs[i]] = sol_reduced[i];
   }
 
   // Initial inputs for the NNet
-  for (i = 0; i < n_inp; i++) {
+  for (i = 0; i < n_inp; i++)
+  {
     u[i] = 0.0;
   }
 
   // Initial hidden neuron activations
-  for (i = 0; i < n_hid1; i++) {
+  for (i = 0; i < n_hid1; i++)
+  {
     z_init[i] = 0.0;
   }
 
   // Running the NNet for 20 iterations with zero input
-  for (t = 0; t < 20; t++) {
+  for (t = 0; t < 20; t++)
+  {
     output_nnet(u, z_init, z, y, sol);
 
-    for (i = 0; i < n_hid1; i++) {
+    for (i = 0; i < n_hid1; i++)
+    {
       z_init[i] = z[i];
     }
   }
@@ -348,7 +398,8 @@ double nnet::eval(int k, int j) {
   st[5] = 0.0;                  // (rad/s) ang. velocity - pole 2
   t = 0;                        // iteration
 
-  for (i = 0; i < n_hid1; i++) {
+  for (i = 0; i < n_hid1; i++)
+  {
     z_old[i] = z_init[i];
   }
 
@@ -356,14 +407,16 @@ double nnet::eval(int k, int j) {
   sum_fst = 0.0;
 
   // Simulation of the Double Pole
-  while (t < t_max && fabs(st[0]) < max_x && fabs(st[2]) < max_teta && fabs(st[4]) < max_teta) {
+  while (t < t_max && fabs(st[0]) < max_x && fabs(st[2]) < max_teta && fabs(st[4]) < max_teta)
+  {
     u[0] = st[0] / max_x;    // cart position: x
     u[1] = st[2] / max_teta; // angle - pole 1
     u[2] = st[4] / max_teta; // angle - pole 2
 
     output_nnet(u, z_old, z, y, sol);
 
-    for (i = 0; i < n_hid1; i++) {
+    for (i = 0; i < n_hid1; i++)
+    {
       z_old[i] = z[i];
     }
 
@@ -373,17 +426,20 @@ double nnet::eval(int k, int j) {
     // compute f_cheap
     fst[t] = fabs(st[0]) + fabs(st[1]) + fabs(st[2]) + fabs(st[3]);
 
-    if (t <= 100) {
+    if (t <= 100)
+    {
       fit_stable = 0.0;
       sum_fst = sum_fst + fst[t];
-    } else {
+    }
+    else
+    {
       sum_fst = sum_fst + fst[t] - fst[t - 101];
       fit_stable = 0.75 / sum_fst;
     }
 
     f_cheap = 0.0001 * t + 0.9 * fit_stable;
 
-    //Pole->print();
+    Pole->print();
 
     t++;
   }
@@ -407,7 +463,8 @@ double nnet::eval(int k, int j) {
 /******************************************************************************\
 *								Save NNet information														   *
 \******************************************************************************/
-void nnet::save(int n_run) {
+void nnet::save(int n_run)
+{
   int i, j;
   FILE *NN_file;
   char *name_p;
@@ -417,7 +474,8 @@ void nnet::save(int n_run) {
 
   sprintf(name, "data/NN_%d.dat", n_run);
 
-  if ((NN_file = fopen(name_p, "w")) == NULL) {
+  if ((NN_file = fopen(name_p, "w")) == NULL)
+  {
     puts("The file NN to be saved cannot be open \n");
     exit(1);
   }
@@ -428,8 +486,10 @@ void nnet::save(int n_run) {
 
   // Save W_in
   fprintf(NN_file, "W_in\n");
-  for (i = 0; i < n_hid1; i++) {
-    for (j = 0; j < n_inp; j++) {
+  for (i = 0; i < n_hid1; i++)
+  {
+    for (j = 0; j < n_inp; j++)
+    {
       fprintf(NN_file, "%1.14f ", W_in[i][j]);
     }
     fprintf(NN_file, "\n");
@@ -437,8 +497,10 @@ void nnet::save(int n_run) {
 
   // Save W
   fprintf(NN_file, "W_rec\n");
-  for (i = 0; i < n_hid1; i++) {
-    for (j = 0; j < n_hid1; j++) {
+  for (i = 0; i < n_hid1; i++)
+  {
+    for (j = 0; j < n_hid1; j++)
+    {
       fprintf(NN_file, "%1.14f ", W[i][j]);
     }
     fprintf(NN_file, "\n");
@@ -446,8 +508,10 @@ void nnet::save(int n_run) {
 
   // Save W_hid
   fprintf(NN_file, "W_hid\n");
-  for (i = 0; i < n_hid2; i++) {
-    for (j = 0; j < n_hid1; j++) {
+  for (i = 0; i < n_hid2; i++)
+  {
+    for (j = 0; j < n_hid1; j++)
+    {
       fprintf(NN_file, "%1.14f ", W_hid[i][j]);
     }
     fprintf(NN_file, "\n");
@@ -455,8 +519,10 @@ void nnet::save(int n_run) {
 
   // Save W_out
   fprintf(NN_file, "W_out\n");
-  for (i = 0; i < n_out; i++) {
-    for (j = 0; j < n_hid2; j++) {
+  for (i = 0; i < n_out; i++)
+  {
+    for (j = 0; j < n_hid2; j++)
+    {
       fprintf(NN_file, "%1.14f ", W_out[i][j]);
     }
     fprintf(NN_file, "\n");
@@ -464,21 +530,24 @@ void nnet::save(int n_run) {
 
   // Save bias neurons layer hid1
   fprintf(NN_file, "B_hid1\n");
-  for (i = 0; i < n_hid1; i++) {
+  for (i = 0; i < n_hid1; i++)
+  {
     fprintf(NN_file, "%1.14f ", hid1_neurons[i].bias);
   }
   fprintf(NN_file, "\n");
 
   // Save bias neurons layer hid2
   fprintf(NN_file, "B_hid2\n");
-  for (i = 0; i < n_hid2; i++) {
+  for (i = 0; i < n_hid2; i++)
+  {
     fprintf(NN_file, "%1.14f ", hid2_neurons[i].bias);
   }
   fprintf(NN_file, "\n");
 
   // Save bias neurons layer out
   fprintf(NN_file, "B_out\n");
-  for (i = 0; i < n_out; i++) {
+  for (i = 0; i < n_out; i++)
+  {
     fprintf(NN_file, "%1.14f ", out_neurons[i].bias);
   }
   fprintf(NN_file, "\n");
@@ -596,7 +665,8 @@ void nnet::save(int n_run) {
 /******************************************************************************\
 *								Print NNet information														   *
 \******************************************************************************/
-void nnet::print(void) {
+void nnet::print(void)
+{
   int i, j;
 
   cout << "Echo State Network: " << endl;
@@ -606,15 +676,18 @@ void nnet::print(void) {
   cout << " Number of Outputs: " << n_out << endl;
   cout << " Hidden Layer 1: " << endl;
 
-  for (i = 0; i < n_hid1; i++) {
+  for (i = 0; i < n_hid1; i++)
+  {
     cout << " Neuron: " << i << " , bias: " << hid1_neurons[i].bias << endl;
     cout << "  W_in: ";
-    for (j = 0; j < n_inp; j++) {
+    for (j = 0; j < n_inp; j++)
+    {
       cout << W_in[i][j] << ", ";
     }
     cout << endl;
     cout << "  W: ";
-    for (j = 0; j < n_hid1; j++) {
+    for (j = 0; j < n_hid1; j++)
+    {
       cout << W[i][j] << ", ";
     }
     cout << endl;
@@ -622,10 +695,12 @@ void nnet::print(void) {
 
   cout << " Hidden Layer 2: " << endl;
 
-  for (i = 0; i < n_hid2; i++) {
+  for (i = 0; i < n_hid2; i++)
+  {
     cout << " Neuron: " << i << " , bias: " << hid2_neurons[i].bias << endl;
     cout << "  W_hid: ";
-    for (j = 0; j < n_hid1; j++) {
+    for (j = 0; j < n_hid1; j++)
+    {
       cout << W_hid[i][j] << ", ";
     }
     cout << endl;
@@ -633,10 +708,12 @@ void nnet::print(void) {
 
   cout << " Output Layer: " << endl;
 
-  for (i = 0; i < n_out; i++) {
+  for (i = 0; i < n_out; i++)
+  {
     cout << " Neuron: " << i << " , bias: " << out_neurons[i].bias << endl;
     cout << "  W_out: ";
-    for (j = 0; j < n_hid2; j++) {
+    for (j = 0; j < n_hid2; j++)
+    {
       cout << W_out[i][j] << ", ";
     }
     cout << endl;

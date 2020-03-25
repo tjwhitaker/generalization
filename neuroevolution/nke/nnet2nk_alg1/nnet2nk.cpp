@@ -28,32 +28,42 @@
 /******************************************************************************\
 *				  	Define M_out (connectivity)			 					 *
 \******************************************************************************/
-void defConn(int **M_out, int prob_type, int N, int K) {
+void defConn(int **M_out, int prob_type, int N, int K)
+{
   int i, j, k, rand_aux, aux, *v_aux, L_aux, H_aux;
 
   // Initialize output matrix
-  for (i = 0; i < N; i++) {
-    for (j = 0; j < N; j++) {
-      if (i == j) {
+  for (i = 0; i < N; i++)
+  {
+    for (j = 0; j < N; j++)
+    {
+      if (i == j)
+      {
         M_out[i][j] = 1;
-      } else {
+      }
+      else
+      {
         M_out[i][j] = 0;
       }
     }
   }
 
   // Random: randomly defining the epistasis graph
-  if (prob_type == 0) {
+  if (prob_type == 0)
+  {
     v_aux = aloc_vectori(N);
 
-    for (i = 0; i < N; i++) {
+    for (i = 0; i < N; i++)
+    {
       // Initialize vector of output neurons to indices [0, 1, 2, 3, ...]
-      for (j = 0; j < N; j++) {
+      for (j = 0; j < N; j++)
+      {
         v_aux[j] = j;
       }
 
       // For each k, randomly swap output neuron indices
-      for (j = 0; j < K; j++) {
+      for (j = 0; j < K; j++)
+      {
         rand_aux = random_int(j, N - 1);
         aux = v_aux[j];
         v_aux[j] = v_aux[rand_aux];
@@ -61,7 +71,8 @@ void defConn(int **M_out, int prob_type, int N, int K) {
       }
 
       // Set randomly chosen connections to 1 within output matrix
-      for (j = 0; j < K; j++) {
+      for (j = 0; j < K; j++)
+      {
         M_out[i][v_aux[j]] = 1;
       }
     }
@@ -69,33 +80,42 @@ void defConn(int **M_out, int prob_type, int N, int K) {
     delete[] v_aux;
   }
   // Regular: defining the epistasis graph according to the next neighbours
-  else if (prob_type == 1) {
-    for (i = 0; i < N; i++) {
+  else if (prob_type == 1)
+  {
+    for (i = 0; i < N; i++)
+    {
       L_aux = (i + 1) % N;
       H_aux = (i + K) % N;
       j = L_aux;
       aux = 0;
 
       // Set neuron and next k connections to 1
-      while (aux == 0) {
+      while (aux == 0)
+      {
         M_out[i][j] = 1;
-        if (j == H_aux) {
+        if (j == H_aux)
+        {
           aux = 1;
-        } else {
+        }
+        else
+        {
           j = (j + 1) % N;
         }
       }
     }
   }
   // Semi-regular: randomly defining the epistasis graph according to (an interval of) next neighbours
-  else {
+  else
+  {
     v_aux = aloc_vectori(prob_type + 1);
 
-    for (i = 0; i < N; i++) {
+    for (i = 0; i < N; i++)
+    {
       // Defining the low and high limits of the interval
       L_aux = i - (int)ceil(prob_type / 2.0);
 
-      if (L_aux < 0) {
+      if (L_aux < 0)
+      {
         L_aux = N + L_aux;
       }
 
@@ -105,14 +125,16 @@ void defConn(int **M_out, int prob_type, int N, int K) {
       k = 0;
 
       // Set aux vector indices within interval
-      while (j != ((H_aux + 1) % N)) {
+      while (j != ((H_aux + 1) % N))
+      {
         v_aux[k] = j;
         j = (j + 1) % N;
         k++;
       }
 
       // For each k, randomly swap output neurons within interval
-      for (j = 0; j < K; j++) {
+      for (j = 0; j < K; j++)
+      {
         rand_aux = random_int(j, prob_type);
         aux = v_aux[j];
         v_aux[j] = v_aux[rand_aux];
@@ -120,7 +142,8 @@ void defConn(int **M_out, int prob_type, int N, int K) {
       }
 
       // Set randomly chosen connections to 1 within output matrix
-      for (j = 0; j < K; j++) {
+      for (j = 0; j < K; j++)
+      {
         M_out[i][v_aux[j]] = 1;
       }
     }
@@ -132,7 +155,8 @@ void defConn(int **M_out, int prob_type, int N, int K) {
 /******************************************************************************\
 *				  	Main													 *
 \******************************************************************************/
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   int i, j, n_run;
   int N, K;                        // parameter of the NK model: N (size), K (epistasis degree)
   int n_f_cont;                    // n_f_cont = 2^(K+1)
@@ -143,18 +167,22 @@ int main(int argc, char *argv[]) {
   double **F_el;                   // component functions (the number of component functions is N * n_f_cont)
 
   // Arguments
-  if (argc < 6) {
+  if (argc < 6)
+  {
     cout << "Insufficient number of arguments!" << endl;
     cout << "Call: nnet2nk <N> <K> <W> (Prob. type - 0: random; 1: regular; W>1: semi-regular with window W ) <number of reservoirs> <reservoirs size>" << endl;
     exit(1);
-  } else {
+  }
+  else
+  {
     N = atoi(argv[1]);
     K = atoi(argv[2]);
     prob_type = atoi(argv[3]);
     n_reservoir = atoi(argv[4]);
     reservoir_size = atoi(argv[5]);
 
-    if (N < 1 || K < 0 || K > N - 1 || n_reservoir < 1 || n_reservoir > 100 || reservoir_size < 1 || reservoir_size > 300 || prob_type < 0 || (prob_type > 1 && prob_type <= K - 1) || prob_type >= N) {
+    if (N < 1 || K < 0 || K > N - 1 || n_reservoir < 1 || n_reservoir > 100 || reservoir_size < 1 || reservoir_size > 300 || prob_type < 0 || (prob_type > 1 && prob_type <= K - 1) || prob_type >= N)
+    {
       cout << "Incorrect values for the arguments!" << endl;
       cout << "Call: nnet2nk < N>0 >  < 0<K<N >  < W > (Prob. type - 0: random; 1: regular; W>1: semi-regular with window W ) < 0<number of reservoirs<101 > < 0<reservoirs size<301 >" << endl;
       exit(1);
@@ -172,7 +200,8 @@ int main(int argc, char *argv[]) {
   cout << "\n ***** Defining the Neural Networks ****" << endl;
   cout << "N=" << N << ", K=" << K << endl;
 
-  for (n_run = 0; n_run < n_runs_max; n_run++) {
+  for (n_run = 0; n_run < n_runs_max; n_run++)
+  {
     cout << "Run:" << n_run << "\n"
          << endl;
     srand(n_run + 1);
@@ -185,8 +214,10 @@ int main(int argc, char *argv[]) {
     esn->save(n_run);
 
     // Evaluation of NN i.j
-    for (i = 0; i < N; i++) {
-      for (j = 0; j < n_f_cont; j++) {
+    for (i = 0; i < N; i++)
+    {
+      for (j = 0; j < n_f_cont; j++)
+      {
         F_el[i][j] = esn->eval(i, j);
       }
     }
