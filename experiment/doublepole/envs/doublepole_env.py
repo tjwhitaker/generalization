@@ -17,8 +17,8 @@ class DoublePoleEnv(gym.Env):
 
     Dynamics:
       Track Length: [-2.4, 2.4] m
-      Gravity: 9.80665 m/s
-      Cart Mass 1 kg 
+      Gravity: -9.80665 m/s
+      Cart Mass: 1 kg 
       Pole 1 Mass: 0.1 kg
       Pole 2 Mass: 0.01 kg
       Pole 1 Length: 1 m
@@ -139,10 +139,11 @@ class DoublePoleEnv(gym.Env):
     # return np.array(self.state), reward, done, {}
     self.dynamic_system(action, self.state, self.dstate)
     self.runge_kutta(action, self.state, self.dstate)
-   
-    print(self.state)
 
-    return np.array(self.state), 1, False, {}
+    done = False
+    reward = 1.0
+
+    return np.array(self.state), reward, done 
 
   def reset(self):
     # State Dynamics
