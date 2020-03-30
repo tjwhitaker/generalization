@@ -47,8 +47,8 @@ class DoublePoleEnv(gym.Env):
     self.max_position = 2.4
 
     # Spaces
-    self.action_space = spaces.Box(np.array(-np.inf), np.array(np.inf))
-    self.observation_space = spaces.Box(np.array([-self.max_position, -self.max_theta, -self.max_theta]), np.array([self.max_position, self.max_theta, self.max_theta]))
+    self.action_space = spaces.Box(np.array([-np.inf]), np.array([np.inf]))
+    self.observation_space = spaces.Box(np.array([-self.max_position, -np.inf, -self.max_theta, -np.inf, -self.max_theta, -np.inf]), np.array([self.max_position, np.inf, self.max_theta, np.inf, self.max_theta, np.inf]))
     
     # State Dynamics
     # [x, dx, theta1, dtheta1, theta2, dtheta2]
@@ -140,15 +140,24 @@ class DoublePoleEnv(gym.Env):
     self.dynamic_system(action, self.state, self.dstate)
     self.runge_kutta(action, self.state, self.dstate)
 
-    done = False
-    reward = 1.0
+    done = bool(self.state[0] < -self.max_position \
+      or self.state[0] > self.max_position \
+      or self.state[2] < -self.max_theta \
+      or self.state[2] > self.max_theta \
+      or self.state[4] < -self.max_theta \
+      or self.state[4] > self.max_theta)
 
-    return np.array(self.state), reward, done 
+    if not done:
+      reward = 1.0
+    else:
+      reward = 0.0
+
+    return np.array(self.state), reward, done, {}
 
   def reset(self):
     # State Dynamics
     # [x, dx, theta1, dtheta1, theta2, dtheta2]
-    self.state = np.array([0, 0, 0 * (2 * np.pi) / 360, 0, 0, 0])
+    self.state = np.array([0, 0, 4.5 * (2 * np.pi) / 360, 0, 0, 0])
     self.dstate = np.zeros(6)
 
     return np.array(self.state)

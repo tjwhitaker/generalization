@@ -1,4 +1,5 @@
 README.md
+setup.py
 doublepole.egg-info/PKG-INFO
 doublepole.egg-info/SOURCES.txt
 doublepole.egg-info/dependency_links.txt
