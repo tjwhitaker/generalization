@@ -1,6 +1,5 @@
 import gym
 from gym import spaces
-from math import cos, sin
 import numpy as np
 
 class DoublePoleEnv(gym.Env):
@@ -47,8 +46,8 @@ class DoublePoleEnv(gym.Env):
     self.max_position = 2.4
 
     # Spaces
-    self.action_space = spaces.Box(np.array([-np.inf]), np.array([np.inf]))
-    self.observation_space = spaces.Box(np.array([-self.max_position, -np.inf, -self.max_theta, -np.inf, -self.max_theta, -np.inf]), np.array([self.max_position, np.inf, self.max_theta, np.inf, self.max_theta, np.inf]))
+    self.action_space = spaces.Box(np.array([-100]), np.array([100]))
+    self.observation_space = spaces.Box(np.array([-self.max_position, -100, -self.max_theta, -100, -self.max_theta, -100]), np.array([self.max_position, 100, self.max_theta, 100, self.max_theta, 100]))
     
     # State Dynamics
     # [x, dx, theta1, dtheta1, theta2, dtheta2]
@@ -59,10 +58,10 @@ class DoublePoleEnv(gym.Env):
     self.viewer = None
 
   def dynamic_system(self, force, state, dstate):
-    pole_1_cos_theta = cos(state[2])
-    pole_1_sin_theta = sin(state[2])
-    pole_2_cos_theta = cos(state[4])
-    pole_2_sin_theta = sin(state[4])
+    pole_1_cos_theta = np.cos(state[2])
+    pole_1_sin_theta = np.sin(state[2])
+    pole_2_cos_theta = np.cos(state[4])
+    pole_2_sin_theta = np.sin(state[4])
 
     pole_1_effective_mass = self.pole_1_mass * (1.0 - 0.75 * (pole_1_cos_theta ** 2))
     pole_1_effective_force = self.pole_1_mass * self.pole_1_length * (state[3]**2) * pole_1_sin_theta + 0.75 * self.pole_1_mass * pole_1_cos_theta * ((self.pole_friction * state[3]) / (self.pole_1_mass * self.pole_1_length) + self.gravity * pole_1_sin_theta)
@@ -75,12 +74,12 @@ class DoublePoleEnv(gym.Env):
     dstate[5] = -0.75 * (dstate[1] * pole_2_cos_theta + self.gravity * pole_2_sin_theta + (self.pole_friction * state[5]) / (self.pole_2_mass * self.pole_2_length)) / self.pole_2_length
 
   def runge_kutta(self, force, state, dstate):
-    u1 = [0,0,0,0,0,0]
-    u2 = [0,0,0,0,0,0]
-    u3 = [0,0,0,0,0,0]
-    u4 = [0,0,0,0,0,0]
-    state_temp = [0,0,0,0,0,0]
-    dstate_temp = [0,0,0,0,0,0]
+    u1 = np.zeros(6)
+    u2 = np.zeros(6)
+    u3 = np.zeros(6)
+    u4 = np.zeros(6)
+    state_temp = np.zeros(6)
+    dstate_temp = np.zeros(6)
 
     # u1
     for i in range(len(state)):
@@ -134,11 +133,8 @@ class DoublePoleEnv(gym.Env):
     dstate[4] = state[5]
 
   def step(self, action):
-    # Change state
-    # runge_kutta(action, self.state, self.dstate)
-    # return np.array(self.state), reward, done, {}
-    self.dynamic_system(action, self.state, self.dstate)
-    self.runge_kutta(action, self.state, self.dstate)
+    self.dynamic_system(action[0], self.state, self.dstate)
+    self.runge_kutta(action[0], self.state, self.dstate)
 
     done = bool(self.state[0] < -self.max_position \
       or self.state[0] > self.max_position \
@@ -148,15 +144,13 @@ class DoublePoleEnv(gym.Env):
       or self.state[4] > self.max_theta)
 
     if not done:
-      reward = 1.0
+      reward = 0.1
     else:
       reward = 0.0
 
     return np.array(self.state), reward, done, {}
 
   def reset(self):
-    # State Dynamics
-    # [x, dx, theta1, dtheta1, theta2, dtheta2]
     self.state = np.array([0, 0, 4.5 * (2 * np.pi) / 360, 0, 0, 0])
     self.dstate = np.zeros(6)
 
