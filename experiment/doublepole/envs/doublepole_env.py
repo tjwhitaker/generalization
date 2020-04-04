@@ -4,12 +4,15 @@ import numpy as np
 
 class DoublePoleEnv(gym.Env):
   """
-    Non-Markovian Double Pole Balancing
+    Markovian Double Pole Balancing
 
     Observations:
       Cart Position
+      Cart Velocity
       Pole 1 Angle
+      Pole 1 Velocity
       Pole 2 Angle
+      Pole 2 Velocity
 
     Actions:
       Continuous Force: [-inf, inf] N
@@ -133,8 +136,8 @@ class DoublePoleEnv(gym.Env):
     dstate[4] = state[5]
 
   def step(self, action):
-    self.dynamic_system(action[0], self.state, self.dstate)
-    self.runge_kutta(action[0], self.state, self.dstate)
+    self.dynamic_system(10*action[0], self.state, self.dstate)
+    self.runge_kutta(10*action[0], self.state, self.dstate)
 
     done = bool(self.state[0] < -self.max_position \
       or self.state[0] > self.max_position \
@@ -144,7 +147,7 @@ class DoublePoleEnv(gym.Env):
       or self.state[4] > self.max_theta)
 
     if not done:
-      reward = 0.1
+      reward = 1.0
     else:
       reward = 0.0
 
@@ -154,7 +157,13 @@ class DoublePoleEnv(gym.Env):
     self.state = np.array([0, 0, 4.5 * (2 * np.pi) / 360, 0, 0, 0])
     self.dstate = np.zeros(6)
 
-    return np.array(self.state)
+    return self.state
+
+  def reset_to_state(self, state):
+    self.state = np.array(state)
+    self.dstate = np.zeros(6)
+
+    return self.state
 
   def render(self, mode='human'):
     screen_width = 600
@@ -162,7 +171,7 @@ class DoublePoleEnv(gym.Env):
 
     world_width = self.max_position*2
     scale = screen_width/world_width
-    carty = 100 # TOP OF CART
+    carty = 100
     polewidth = 10.0
     polelen = scale * self.pole_1_length
     pole2len = scale * self.pole_2_length
@@ -221,7 +230,7 @@ class DoublePoleEnv(gym.Env):
     pole2.v = [(l,b), (l,t), (r,t), (r,b)]
 
     x = self.state
-    cartx = x[0]*scale+screen_width/2.0 # MIDDLE OF CART
+    cartx = x[0]*scale+screen_width/2.0
     self.carttrans.set_translation(cartx, carty)
     self.poletrans.set_rotation(-x[2])
     self.poletrans2.set_rotation(-x[4])
