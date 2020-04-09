@@ -47,16 +47,20 @@ class DoublePoleEnv(gym.Env):
     # Failing State
     self.max_theta = 36 * (2 * np.pi) / 360
     self.max_position = 2.4
+  
 
     # Spaces
     self.action_space = spaces.Box(np.array([-100]), np.array([100]))
-    self.observation_space = spaces.Box(np.array([-self.max_position, -100, -self.max_theta, -100, -self.max_theta, -100]), np.array([self.max_position, 100, self.max_theta, 100, self.max_theta, 100]))
+    self.observation_space = spaces.Box(np.array([-self.max_position, -1000, -self.max_theta, -1000, -self.max_theta, -1000]), np.array([self.max_position, 1000, self.max_theta, 1000, self.max_theta, 1000]))
     
     # State Dynamics
     # [x, dx, theta1, dtheta1, theta2, dtheta2]
     # [dx, ddx, dtheta1, ddtheta1, dtheta2, ddtheta2]
     self.state = np.zeros(6)
     self.dstate = np.zeros(6)
+
+    self.state_history = []
+    self.iteration = 0
 
     self.viewer = None
 
@@ -135,7 +139,21 @@ class DoublePoleEnv(gym.Env):
     dstate[2] = state[3]
     dstate[4] = state[5]
 
+  def f_stable(self):
+    if self.iteration < 100:
+      return 0
+    else:
+      sum = 0
+
+      for state in self.state_history[-100:]:
+        sum += abs(state[0]) + abs(state[1]) + abs(state[2]) + abs(state[3])
+
+      return 0.75 / sum
+
   def step(self, action):
+    self.state_history.append(self.state)
+    self.iteration += 1
+    
     self.dynamic_system(10*action[0], self.state, self.dstate)
     self.runge_kutta(10*action[0], self.state, self.dstate)
 
@@ -146,22 +164,28 @@ class DoublePoleEnv(gym.Env):
       or self.state[4] < -self.max_theta \
       or self.state[4] > self.max_theta)
 
-    if not done:
-      reward = 1.0
-    else:
-      reward = 0.0
+    reward = 0
+
+    if done:
+      reward = (0.0001 * self.iteration) + (0.9 * self.f_stable())
 
     return np.array(self.state), reward, done, {}
 
   def reset(self):
-    self.state = np.array([0, 0, 4.5 * (2 * np.pi) / 360, 0, 0, 0])
+    self.state = np.array([0, 0, 2.5 * (2 * np.pi) / 360, 0, 0, 0])
     self.dstate = np.zeros(6)
+
+    self.state_history = []
+    self.iteration = 0
 
     return self.state
 
   def reset_to_state(self, state):
     self.state = np.array(state)
     self.dstate = np.zeros(6)
+
+    self.state_history = []
+    self.iteration = 0
 
     return self.state
 
