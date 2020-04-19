@@ -52,9 +52,6 @@ class SinglePoleEnv(gym.Env):
     self.state = np.zeros(4)
     self.dstate = np.zeros(4)
 
-    self.state_history = []
-    self.iteration = 0
-
     self.viewer = None
 
   def dynamic_system(self, force, state, dstate):
@@ -122,51 +119,31 @@ class SinglePoleEnv(gym.Env):
     dstate[0] = state[1]
     dstate[2] = state[3]
 
-  def f_stable(self):
-    if self.iteration < 100:
-      return 0
-    else:
-      sum = 0
-
-      for state in self.state_history[-100:]:
-        sum += abs(state[0]) + abs(state[1]) + abs(state[2]) + abs(state[3])
-
-      return 0.75 / sum
-
   def step(self, action):
     self.dynamic_system(10*action[0], self.state, self.dstate)
     self.runge_kutta(10*action[0], self.state, self.dstate)
-
-    self.state_history.append(self.state)
-    self.iteration += 1
 
     done = bool(self.state[0] < -self.max_position \
       or self.state[0] > self.max_position \
       or self.state[2] < -self.max_theta \
       or self.state[2] > self.max_theta)
-      
-    reward = 0
 
-    if done:
-      reward = (0.0001 * self.iteration) + (0.9 * self.f_stable())
+    if not done:
+      reward = 1.0
+    else:
+      reward = 0.0
 
     return np.array(self.state), reward, done, {}
 
   def reset(self):
     self.state = np.array([0, 0, 4.5 * (2 * np.pi) / 360, 0])
     self.dstate = np.zeros(4)
-    
-    self.state_history = []
-    self.iteration = 0
 
     return self.state
 
   def reset_to_state(self, state):
     self.state = np.array(state)
     self.dstate = np.zeros(4)
-
-    self.state_history = []
-    self.iteration = 0
 
     return self.state
 

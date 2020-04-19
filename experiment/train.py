@@ -14,7 +14,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--cpu', type=int, default=4)
     parser.add_argument('--num_runs', type=int, default=1)
-    parser.add_argument('--epochs', type=int, default=1)
+    parser.add_argument('--epochs', type=int, default=100)
     args = parser.parse_args()
 
     algos = [vpg_tf1, trpo_tf1, ppo_tf1, ddpg_tf1, td3_tf1, sac_tf1]
