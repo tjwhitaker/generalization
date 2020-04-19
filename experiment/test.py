@@ -33,7 +33,7 @@ def test():
             for s1 in percentages:
                 for s2 in percentages:
                     for s3 in percentages:
-                        state = [0, 0, 0, 0, 0, 0]
+                        state = [0, 0, 0, 0]
                         state[0] = (s0 * ranges[0] - ranges[0] / 2)
                         state[1] = (s1 * ranges[1] - ranges[1] / 2)
                         state[2] = (s2 * ranges[2] - ranges[2] / 2) * 2 * np.pi / 360
