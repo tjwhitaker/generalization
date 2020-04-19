@@ -24,6 +24,6 @@ if __name__ == '__main__':
         eg.add('env_fn', env_fn)
         eg.add('epochs', args.epochs)
         eg.add('seed', [10*i for i in range(args.num_runs)])
-        eg.add('ac_kwargs:hidden_sizes', (8, 8), 'hid')
+        eg.add('ac_kwargs:hidden_sizes', (4, 4), 'hid')
         eg.add('logger_kwargs:output_dir', f'data/{algo.__name__}')
         eg.run(algo, num_cpu=args.cpu)

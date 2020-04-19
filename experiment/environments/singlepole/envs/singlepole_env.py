@@ -38,14 +38,16 @@ class SinglePoleEnv(gym.Env):
     self.pole_friction = 0.000002
     self.time_step = 0.01
 
-    # Failing State
+    # State Limits
     self.max_theta = 36 * (2 * np.pi) / 360
     self.max_position = 2.4
 
+    observation_threshold = np.array([self.max_position, np.finfo(np.float32).max, self.max_theta, np.finfo(np.float32).max])
+
     # Spaces
-    self.action_space = spaces.Box(np.array([-100]), np.array([100]))
-    self.observation_space = spaces.Box(np.array([-self.max_position, -100, -self.max_theta, -100]), np.array([self.max_position, 100, self.max_theta, 100]))
-    
+    self.action_space = spaces.Box(np.array([-1]), np.array([1]))
+    self.observation_space = spaces.Box(-observation_threshold, observation_threshold, dtype=np.float32)
+
     # State Dynamics
     # [x, dx, theta1, dtheta1, theta2, dtheta2]
     # [dx, ddx, dtheta1, ddtheta1, dtheta2, ddtheta2]
