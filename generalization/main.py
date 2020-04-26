@@ -6,7 +6,6 @@ from stable_baselines.common.policies import MlpPolicy
 from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines import PPO2
 
-
 # env = DoublePoleEnv()
 env = SinglePoleEnv()
 
@@ -16,8 +15,8 @@ env = SinglePoleEnv()
 # the env is now wrapped automatically when passing it to the constructor
 env = DummyVecEnv([lambda: env])
 
-model = PPO2(MlpPolicy, env, verbose=1)
-model.learn(total_timesteps=50000)
+model = PPO2(MlpPolicy, env, verbose=1, tensorboard_log="./ppo_cartpole_tensorboard/")
+model.learn(total_timesteps=100000)
 
 obs = env.reset()
 for i in range(1000):
