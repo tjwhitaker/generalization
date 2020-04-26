@@ -1,3 +1,12 @@
 # Generalization
 
-Deep RL models come from Open AI. https://github.com/openai/spinningup
+```
+pip3 install -e .
+```
+
+Dependencies
+
+Stable Baselines for RL model implementations.
+https://github.com/hill-a/stable-baselines
+
+Open AI Gym for environments.

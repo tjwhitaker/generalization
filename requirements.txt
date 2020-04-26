@@ -1,0 +1,2 @@
+stable-baselines[mpi]
+gym

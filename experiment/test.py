@@ -17,12 +17,12 @@ def test():
 
     ranges = [4.28, 2.70, 17.2, 7.2]
     percentages = [0.05, 0.25, 0.50, 0.75, 0.95]
-    models = ["/home/tim/Research/generalization/spinningup/data/vpg/vpg_s0/",
-              "/home/tim/Research/generalization/spinningup/data/trpo/trpo_s0/",
-              "/home/tim/Research/generalization/spinningup/data/ppo/ppo_s0/",
-              "/home/tim/Research/generalization/spinningup/data/ddpg/ddpg_s0/",
-              "/home/tim/Research/generalization/spinningup/data/td3/td3_s0/",
-              "/home/tim/Research/generalization/spinningup/data/sac/sac_s0/"]
+    models = ["/home/tim/Research/thesis/experiment/data/vpg/",
+              "/home/tim/Research/thesis/experiment/data/trpo/",
+              "/home/tim/Research/thesis/experiment/data/ppo/",
+              "/home/tim/Research/thesis/experiment/data/ddpg/",
+              "/home/tim/Research/thesis/experiment/data/td3/",
+              "/home/tim/Research/thesis/experiment/data/sac/"]
 
     for model in models:
         score = 0

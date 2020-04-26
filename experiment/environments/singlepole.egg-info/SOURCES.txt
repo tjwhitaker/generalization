@@ -1,6 +1,0 @@
-setup.py
-singlepole.egg-info/PKG-INFO
-singlepole.egg-info/SOURCES.txt
-singlepole.egg-info/dependency_links.txt
-singlepole.egg-info/requires.txt
-singlepole.egg-info/top_level.txt

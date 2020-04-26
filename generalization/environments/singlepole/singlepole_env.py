@@ -42,7 +42,11 @@ class SinglePoleEnv(gym.Env):
     self.max_theta = 36 * (2 * np.pi) / 360
     self.max_position = 2.4
 
-    observation_threshold = np.array([self.max_position, np.finfo(np.float32).max, self.max_theta, np.finfo(np.float32).max])
+    observation_threshold = np.array([
+      self.max_position, 
+      np.finfo(np.float32).max, 
+      self.max_theta, 
+      np.finfo(np.float32).max])
 
     # Spaces
     self.action_space = spaces.Box(np.array([-1]), np.array([1]))

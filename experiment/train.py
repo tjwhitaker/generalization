@@ -14,7 +14,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--cpu', type=int, default=4)
     parser.add_argument('--num_runs', type=int, default=1)
-    parser.add_argument('--epochs', type=int, default=100)
+    parser.add_argument('--epochs', type=int, default=500)
     args = parser.parse_args()
 
     algos = [vpg_tf1, trpo_tf1, ppo_tf1, ddpg_tf1, td3_tf1, sac_tf1]
@@ -24,6 +24,6 @@ if __name__ == '__main__':
         eg.add('env_fn', env_fn)
         eg.add('epochs', args.epochs)
         eg.add('seed', [10*i for i in range(args.num_runs)])
-        eg.add('ac_kwargs:hidden_sizes', (4, 4), 'hid')
+        eg.add('ac_kwargs:hidden_sizes', (8, 8), 'hid')
         eg.add('logger_kwargs:output_dir', f'data/{algo.__name__}')
         eg.run(algo, num_cpu=args.cpu)
