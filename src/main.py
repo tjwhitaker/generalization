@@ -1,4 +1,3 @@
-import gym
 from environments.singlepole import SinglePoleEnv
 from environments.doublepole import DoublePoleEnv
 
@@ -35,9 +34,11 @@ if __name__ == '__main__':
     # (a2c, acktr, ddpg, gail, ppo, sac, td3, trpo)
     parser.add_argument('--model', default='')
 
+    # (mlp, lstm, lnlstm)
+    parser.add_argument('-policy', default='mlp')
+
     # (single, double)
     parser.add_argument('--env', default='single')
-
 
     args = parser.parse_args()
 
