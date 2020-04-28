@@ -1,2 +1,4 @@
 stable-baselines[mpi]
 gym
+numpy
+tendsorflow
