@@ -56,6 +56,3 @@ def test():
     
         print(model, score)
         tf.reset_default_graph()
-
-if __name__ == '__main__':
-    test()

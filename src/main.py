@@ -1,29 +1,10 @@
+import argparse
+
 from environments.singlepole import SinglePoleEnv
 from environments.doublepole import DoublePoleEnv
-
-from stable_baselines.common.policies import MlpPolicy
 from stable_baselines.common.vec_env import DummyVecEnv
-from stable_baselines import PPO2
 
-from models.a2c import a2c
-from models.acktr import acktr
-from models.ddpg import ddpg
-from models.gail import gail
-from models.ppo import ppo
-from models.sac import sac
-from models.td3 import td3
-from models.trpo import trpo
-
-model = ppo(MlpPolicy, env, "./ppo_cartpole_tensorboard/")
-model.learn(total_timesteps=2000)
-
-obs = env.reset()
-for i in range(1000):
-    action, _states = model.predict(obs)
-    obs, rewards, dones, info = env.step(action)
-    env.render()
-
-import argparse
+from models import a2c, acktr, ddpg, ppo, sac, td3, trpo
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -31,7 +12,7 @@ if __name__ == '__main__':
     # (train, test)
     parser.add_argument('--action', default='test')
 
-    # (a2c, acktr, ddpg, gail, ppo, sac, td3, trpo)
+    # (a2c, acktr, ddpg, ppo, sac, td3, trpo)
     parser.add_argument('--model', default='')
 
     # (mlp, lstm, lnlstm)
@@ -51,4 +32,7 @@ if __name__ == '__main__':
     # Set up vectorized environment
     env = DummyVecEnv([lambda: env])
 
+    # Set up models
+    model = ppo(env)
 
+    model.learn(total_timesteps=50000)
