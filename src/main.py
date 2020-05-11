@@ -1,4 +1,5 @@
 import argparse
+import tensorflow as tf
 
 from environments.singlepole import SinglePoleEnv
 from environments.doublepole import DoublePoleEnv
@@ -6,39 +7,33 @@ from stable_baselines.common.vec_env import DummyVecEnv
 
 from models import a2c, acktr, ddpg, ppo, sac, td3, trpo
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-
-    # (train, test)
-    parser.add_argument('--action', default='test')
-
-    # (a2c, acktr, ddpg, ppo, sac, td3, trpo)
-    parser.add_argument('--model', default='')
-
-    # (mlp, lstm, lnlstm)
-    parser.add_argument('-policy', default='mlp')
-
-    # (single, double)
-    parser.add_argument('--env', default='single')
-
-    args = parser.parse_args()
+if __name__ == '__main__'
 
     # Choose environment
-    if args.env == 'single':
-        env = SinglePoleEnv()
-    elif args.env == 'double':
-        env = DoublePoleEnv()
+    env = SinglePoleEnv()
+    # env = DoublePoleEnv()
 
-    # Set up vectorized environment
-    env = DummyVecEnv([lambda: env])
+    # Set up models
+    model = a2c(env)
+    model.learn(total_timesteps=100000)
+    model.save("data/models/a2c_100k")
 
-    # Set up model
+    model = ddpg(env)
+    model.learn(total_timesteps=100000)
+    model.save("data/models/ddpg_100k")
+
     model = ppo(env)
+    model.learn(total_timesteps=100000)
+    model.save("data/models/ppo_100k")
 
-    model.learn(total_timesteps=50000)
+    model = sac(env)
+    model.learn(total_timesteps=100000)
+    model.save("data/models/sac_100k")
 
-    obs = env.reset()
-    while True:
-        action, _states = model.predict(obs)
-        obs, rewards, dones, info = env.step(action)
-        env.render()
+    model = td3(env)
+    model.learn(total_timesteps=100000)
+    model.save("data/models/td3_100k")
+
+    model = trpo(env)
+    model.learn(total_timesteps=100000)
+    model.save("data/models/trpo_100k")
