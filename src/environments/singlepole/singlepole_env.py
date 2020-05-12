@@ -146,26 +146,26 @@ class SinglePoleEnv(gym.Env):
         else:
             reward = 0.0
 
-        return normalize_state(self.state), reward, done, {}
+        return self.normalize_state(self.state), reward, done, {}
 
     def reset(self):
         self.state = np.array([0, 0, 4.5 * (2 * np.pi) / 360, 0])
         self.dstate = np.zeros(4)
 
-        return normalize_state(self.state)
+        return self.normalize_state(self.state)
 
     def reset_to_state(self, state):
         self.state = np.array(state)
         self.dstate = np.zeros(4)
 
-        return normalize_state(self.state)
+        return self.normalize_state(self.state)
 
     def normalize_state(self, state):
         max_theta = 36 * (2 * np.pi) / 360
         x1 = 2 * ((state[0] + 2.4)/(4.8)) - 1
-        x2 = tanh(state[1])
+        x2 = np.tanh(state[1])
         x3 = 2 * ((state[2] + max_theta)/(2 * max_theta)) - 1
-        x4 = tanh(state[3])
+        x4 = np.tanh(state[3])
 
         return np.array([x1, x2, x3, x4])
 
