@@ -9,12 +9,19 @@ from train import train_models
 from test import test_models
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--action', default='test')
+    parser.add_argument('--env', default='single')
+    args = parser.parse_args()
+
     # Choose environment
-    env = SinglePoleEnv()
-    # env = DoublePoleEnv()
+    if args.env == 'single':
+        env = SinglePoleEnv()
+    elif args.env == 'double':
+        env = DoublePoleEnv()
 
-    # Train all models
-    # train_models(env)
-
-    # Test Models
-    test_models(env)
+    # Train or Test All Models
+    if args.action == 'train':
+        train_models(env)
+    elif args.action == 'test':
+        test_models(env)

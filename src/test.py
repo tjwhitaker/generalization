@@ -5,18 +5,18 @@ from stable_baselines import A2C, ACKTR, DDPG, PPO2, SAC, TD3, TRPO
 
 def test_models(env):
     # Load Models
-    models = [A2C.load('data/models/a2c_10k'),
-              ACKTR.load('data/models/acktr_10k'),
-              DDPG.load('data/models/ddpg_10k'),
-              PPO2.load('data/models/ppo_10k'),
-              SAC.load('data/models/sac_10k'),
-              TD3.load('data/models/td3_10k'),
-              TRPO.load('data/models/trpo_10k')]
+    models = [A2C.load('data/models/a2c_500k'),
+              ACKTR.load('data/models/acktr_500k'),
+              DDPG.load('data/models/ddpg_500k'),
+              PPO2.load('data/models/ppo_500k'),
+              SAC.load('data/models/sac_500k'),
+              TD3.load('data/models/td3_500k'),
+              TRPO.load('data/models/trpo_500k')]
 
     # Visual Demo
     for m in models:
-        # run_policy(m, env)
-        generalization_test(m, env)
+        run_policy(m, env)
+        # generalization_test(m, env)
 
 
 def run_policy(model, env):
@@ -30,6 +30,9 @@ def run_policy(model, env):
         if done:
             break
 
+
+# Set up for single pole env
+# TODO: Parametrize to make usable for single/double markov/nonmarkov
 
 def generalization_test(model, env):
     ranges = [4.28, 2.70, 17.2, 7.2]

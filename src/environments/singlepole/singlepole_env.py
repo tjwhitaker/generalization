@@ -2,214 +2,231 @@ import gym
 from gym import spaces
 import numpy as np
 
+
 class SinglePoleEnv(gym.Env):
-  """
-    Markovian Single Pole Balancing
+    """
+      Markovian Single Pole Balancing
 
-    Observations:
-      Cart Position
-      Cart Velocity
-      Pole 1 Angle
-      Pole 1 Velocity
+      Observations:
+        Cart Position
+        Cart Velocity
+        Pole 1 Angle
+        Pole 1 Velocity
 
-    Actions:
-      Continuous Force: [-inf, inf] N
+      Actions:
+        Continuous Force: [-inf, inf] N
 
-    Dynamics:
-      Track Length: [-2.4, 2.4] m
-      Gravity: -9.80665 m/s
-      Cart Mass: 1 kg 
-      Pole 1 Mass: 0.1 kg
-      Pole 1 Length: 1 m
-      Cart/Track Friction: 0.0005
-      Cart/Pole Friction: 0.000002
-      Time Step: 0.01
-  """
+      Dynamics:
+        Track Length: [-2.4, 2.4] m
+        Gravity: -9.80665 m/s
+        Cart Mass: 1 kg 
+        Pole 1 Mass: 0.1 kg
+        Pole 1 Length: 1 m
+        Cart/Track Friction: 0.0005
+        Cart/Pole Friction: 0.000002
+        Time Step: 0.01
+    """
 
-  metadata = {'render.modes': ['human']}
-  
-  def __init__(self):
-    # Dynamics
-    self.gravity = -9.80665
-    self.cart_mass = 1
-    self.pole_1_mass = 0.1
-    self.pole_1_length = 1
-    self.track_friction = 0.0005
-    self.pole_friction = 0.000002
-    self.time_step = 0.01
+    metadata = {'render.modes': ['human']}
 
-    # State Limits
-    self.max_theta = 36 * (2 * np.pi) / 360
-    self.max_position = 2.4
+    def __init__(self):
+        # Dynamics
+        self.gravity = -9.80665
+        self.cart_mass = 1
+        self.pole_1_mass = 0.1
+        self.pole_1_length = 1
+        self.track_friction = 0.0005
+        self.pole_friction = 0.000002
+        self.time_step = 0.01
 
-    observation_threshold = np.array([
-      self.max_position, 
-      np.finfo(np.float32).max, 
-      self.max_theta, 
-      np.finfo(np.float32).max])
+        # State Limits
+        self.max_theta = 36 * (2 * np.pi) / 360
+        self.max_position = 2.4
 
-    # Spaces
-    self.action_space = spaces.Box(np.array([-1]), np.array([1]))
-    self.observation_space = spaces.Box(-observation_threshold, observation_threshold, dtype=np.float32)
+        observation_threshold = np.array([
+            self.max_position,
+            np.finfo(np.float32).max,
+            self.max_theta,
+            np.finfo(np.float32).max])
 
-    # State Dynamics
-    # [x, dx, theta1, dtheta1, theta2, dtheta2]
-    # [dx, ddx, dtheta1, ddtheta1, dtheta2, ddtheta2]
-    self.state = np.zeros(4)
-    self.dstate = np.zeros(4)
+        # Spaces
+        self.action_space = spaces.Box(np.array([-1]), np.array([1]))
+        self.observation_space = spaces.Box(
+            -observation_threshold, observation_threshold, dtype=np.float32)
 
-    self.viewer = None
+        # State Dynamics
+        # [x, dx, theta1, dtheta1, theta2, dtheta2]
+        # [dx, ddx, dtheta1, ddtheta1, dtheta2, ddtheta2]
+        self.state = np.zeros(4)
+        self.dstate = np.zeros(4)
 
-  def dynamic_system(self, force, state, dstate):
-    pole_1_cos_theta = np.cos(state[2])
-    pole_1_sin_theta = np.sin(state[2])
+        self.viewer = None
 
-    pole_1_effective_mass = self.pole_1_mass * (1.0 - 0.75 * (pole_1_cos_theta ** 2))
-    pole_1_effective_force = self.pole_1_mass * self.pole_1_length * (state[3]**2) * pole_1_sin_theta + 0.75 * self.pole_1_mass * pole_1_cos_theta * ((self.pole_friction * state[3]) / (self.pole_1_mass * self.pole_1_length) + self.gravity * pole_1_sin_theta)
-        
-    dstate[1] = (force - self.track_friction * (1.0 if state[1] > 0 else -1.0) + (pole_1_effective_force)) / (self.cart_mass + pole_1_effective_mass)
-    dstate[3] = -0.75 * (dstate[1] * pole_1_cos_theta + self.gravity * pole_1_sin_theta + (self.pole_friction * state[3]) / (self.pole_1_mass * self.pole_1_length)) / self.pole_1_length
+    def dynamic_system(self, force, state, dstate):
+        pole_1_cos_theta = np.cos(state[2])
+        pole_1_sin_theta = np.sin(state[2])
 
-  def runge_kutta(self, force, state, dstate):
-    u1 = np.zeros(6)
-    u2 = np.zeros(6)
-    u3 = np.zeros(6)
-    u4 = np.zeros(6)
-    state_temp = np.zeros(4)
-    dstate_temp = np.zeros(4)
+        pole_1_effective_mass = self.pole_1_mass * \
+            (1.0 - 0.75 * (pole_1_cos_theta ** 2))
+        pole_1_effective_force = self.pole_1_mass * self.pole_1_length * (state[3]**2) * pole_1_sin_theta + 0.75 * self.pole_1_mass * pole_1_cos_theta * (
+            (self.pole_friction * state[3]) / (self.pole_1_mass * self.pole_1_length) + self.gravity * pole_1_sin_theta)
 
-    # u1
-    for i in range(len(state)):
-      u1[i] = self.time_step * dstate[i]
+        dstate[1] = (force - self.track_friction * (1.0 if state[1] > 0 else -1.0) +
+                     (pole_1_effective_force)) / (self.cart_mass + pole_1_effective_mass)
+        dstate[3] = -0.75 * (dstate[1] * pole_1_cos_theta + self.gravity * pole_1_sin_theta + (
+            self.pole_friction * state[3]) / (self.pole_1_mass * self.pole_1_length)) / self.pole_1_length
 
-    # u2
-    for i in range(len(state)):
-      state_temp[i] = state[i] + (u1[i] / 2.0)
+    def runge_kutta(self, force, state, dstate):
+        u1 = np.zeros(6)
+        u2 = np.zeros(6)
+        u3 = np.zeros(6)
+        u4 = np.zeros(6)
+        state_temp = np.zeros(4)
+        dstate_temp = np.zeros(4)
 
-    dstate_temp[0] = state_temp[1]
-    dstate_temp[2] = state_temp[3]
+        # u1
+        for i in range(len(state)):
+            u1[i] = self.time_step * dstate[i]
 
-    self.dynamic_system(force, state_temp, dstate_temp)
+        # u2
+        for i in range(len(state)):
+            state_temp[i] = state[i] + (u1[i] / 2.0)
 
-    for i in range(len(state)):
-      u2[i] = self.time_step * dstate_temp[i]
+        dstate_temp[0] = state_temp[1]
+        dstate_temp[2] = state_temp[3]
 
-    # u3
-    for i in range(len(state)):
-      state_temp[i] = state[i] + (u2[i] / 2.0)
+        self.dynamic_system(force, state_temp, dstate_temp)
 
-    dstate_temp[0] = state_temp[1]
-    dstate_temp[2] = state_temp[3]
+        for i in range(len(state)):
+            u2[i] = self.time_step * dstate_temp[i]
 
-    self.dynamic_system(force, state_temp, dstate_temp)
+        # u3
+        for i in range(len(state)):
+            state_temp[i] = state[i] + (u2[i] / 2.0)
 
-    for i in range(len(state)):
-      u3[i] = self.time_step * dstate_temp[i]
+        dstate_temp[0] = state_temp[1]
+        dstate_temp[2] = state_temp[3]
 
-    # u4
-    for i in range(len(state)):
-      state_temp[i] = state[i] + u3[i]
+        self.dynamic_system(force, state_temp, dstate_temp)
 
-    dstate_temp[0] = state_temp[1]
-    dstate_temp[2] = state_temp[3]
+        for i in range(len(state)):
+            u3[i] = self.time_step * dstate_temp[i]
 
-    self.dynamic_system(force, state_temp, dstate_temp)
+        # u4
+        for i in range(len(state)):
+            state_temp[i] = state[i] + u3[i]
 
-    for i in range(len(state)):
-      u4[i] = self.time_step * dstate_temp[i]
+        dstate_temp[0] = state_temp[1]
+        dstate_temp[2] = state_temp[3]
 
-    # Final Results
-    for i in range(len(state)):
-      state[i] = state[i] + (u1[i] + (2.0 * u2[i]) + (2.0 * u3[i] + u4[i])) / 6.0
+        self.dynamic_system(force, state_temp, dstate_temp)
 
-    dstate[0] = state[1]
-    dstate[2] = state[3]
+        for i in range(len(state)):
+            u4[i] = self.time_step * dstate_temp[i]
 
-  def step(self, action):
-    self.dynamic_system(10*action[0], self.state, self.dstate)
-    self.runge_kutta(10*action[0], self.state, self.dstate)
+        # Final Results
+        for i in range(len(state)):
+            state[i] = state[i] + \
+                (u1[i] + (2.0 * u2[i]) + (2.0 * u3[i] + u4[i])) / 6.0
 
-    done = bool(self.state[0] < -self.max_position \
-      or self.state[0] > self.max_position \
-      or self.state[2] < -self.max_theta \
-      or self.state[2] > self.max_theta)
+        dstate[0] = state[1]
+        dstate[2] = state[3]
 
-    if not done:
-      reward = 1.0
-    else:
-      reward = 0.0
+    def step(self, action):
+        self.dynamic_system(10*action[0], self.state, self.dstate)
+        self.runge_kutta(10*action[0], self.state, self.dstate)
 
-    return np.array(self.state), reward, done, {}
+        done = bool(self.state[0] < -self.max_position
+                    or self.state[0] > self.max_position
+                    or self.state[2] < -self.max_theta
+                    or self.state[2] > self.max_theta)
 
-  def reset(self):
-    self.state = np.array([0, 0, 4.5 * (2 * np.pi) / 360, 0])
-    self.dstate = np.zeros(4)
+        if not done:
+            reward = 1.0
+        else:
+            reward = 0.0
 
-    return self.state
+        return normalize_state(self.state), reward, done, {}
 
-  def reset_to_state(self, state):
-    self.state = np.array(state)
-    self.dstate = np.zeros(4)
+    def reset(self):
+        self.state = np.array([0, 0, 4.5 * (2 * np.pi) / 360, 0])
+        self.dstate = np.zeros(4)
 
-    return self.state
+        return normalize_state(self.state)
 
-  def render(self, mode='human'):
-    screen_width = 600
-    screen_height = 400
+    def reset_to_state(self, state):
+        self.state = np.array(state)
+        self.dstate = np.zeros(4)
 
-    world_width = self.max_position*2
-    scale = screen_width/world_width
-    carty = 100
-    polewidth = 10.0
-    polelen = scale * self.pole_1_length
-    cartwidth = 50.0
-    cartheight = 30.0
+        return normalize_state(self.state)
 
-    if self.viewer is None:
-      from gym.envs.classic_control import rendering
-      self.viewer = rendering.Viewer(screen_width, screen_height)
-      l,r,t,b = -cartwidth/2, cartwidth/2, cartheight/2, -cartheight/2
-      axleoffset = cartheight/4.0
-      cart = rendering.FilledPolygon([(l,b), (l,t), (r,t), (r,b)])
-      self.carttrans = rendering.Transform()
-      cart.add_attr(self.carttrans)
-      self.viewer.add_geom(cart)
+    def normalize_state(self, state):
+        max_theta = 36 * (2 * np.pi) / 360
+        x1 = 2 * ((state[0] + 2.4)/(4.8)) - 1
+        x2 = tanh(state[1])
+        x3 = 2 * ((state[2] + max_theta)/(2 * max_theta)) - 1
+        x4 = tanh(state[3])
 
-      l,r,t,b = -polewidth/2,polewidth/2,polelen-polewidth/2,-polewidth/2
-      pole = rendering.FilledPolygon([(l,b), (l,t), (r,t), (r,b)])
-      pole.set_color(.8,.6,.4)
-      self.poletrans = rendering.Transform(translation=(0, axleoffset))
-      pole.add_attr(self.poletrans)
-      pole.add_attr(self.carttrans)
-      self.viewer.add_geom(pole)
+        return np.array([x1, x2, x3, x4])
 
-      self.axle = rendering.make_circle(polewidth/2)
-      self.axle.add_attr(self.poletrans)
-      self.axle.add_attr(self.carttrans)
-      self.axle.set_color(.5,.5,.8)
-      self.viewer.add_geom(self.axle)
-      self.track = rendering.Line((0,carty), (screen_width,carty))
-      self.track.set_color(0,0,0)
-      self.viewer.add_geom(self.track)
+    def render(self, mode='human'):
+        screen_width = 600
+        screen_height = 400
 
-      self._pole_geom = pole
+        world_width = self.max_position*2
+        scale = screen_width/world_width
+        carty = 100
+        polewidth = 10.0
+        polelen = scale * self.pole_1_length
+        cartwidth = 50.0
+        cartheight = 30.0
 
-    if self.state is None: return None
+        if self.viewer is None:
+            from gym.envs.classic_control import rendering
+            self.viewer = rendering.Viewer(screen_width, screen_height)
+            l, r, t, b = -cartwidth/2, cartwidth/2, cartheight/2, -cartheight/2
+            axleoffset = cartheight/4.0
+            cart = rendering.FilledPolygon([(l, b), (l, t), (r, t), (r, b)])
+            self.carttrans = rendering.Transform()
+            cart.add_attr(self.carttrans)
+            self.viewer.add_geom(cart)
 
-    # Edit the pole polygon vertex
-    pole = self._pole_geom
+            l, r, t, b = -polewidth/2, polewidth/2, polelen-polewidth/2, -polewidth/2
+            pole = rendering.FilledPolygon([(l, b), (l, t), (r, t), (r, b)])
+            pole.set_color(.8, .6, .4)
+            self.poletrans = rendering.Transform(translation=(0, axleoffset))
+            pole.add_attr(self.poletrans)
+            pole.add_attr(self.carttrans)
+            self.viewer.add_geom(pole)
 
-    l,r,t,b = -polewidth/2,polewidth/2,polelen-polewidth/2,-polewidth/2
-    pole.v = [(l,b), (l,t), (r,t), (r,b)]
+            self.axle = rendering.make_circle(polewidth/2)
+            self.axle.add_attr(self.poletrans)
+            self.axle.add_attr(self.carttrans)
+            self.axle.set_color(.5, .5, .8)
+            self.viewer.add_geom(self.axle)
+            self.track = rendering.Line((0, carty), (screen_width, carty))
+            self.track.set_color(0, 0, 0)
+            self.viewer.add_geom(self.track)
 
-    x = self.state
-    cartx = x[0]*scale+screen_width/2.0
-    self.carttrans.set_translation(cartx, carty)
-    self.poletrans.set_rotation(-x[2])
+            self._pole_geom = pole
 
-    return self.viewer.render(return_rgb_array = mode=='rgb_array')
+        if self.state is None:
+            return None
 
-  def close(self):
-    if self.viewer:
-      self.viewer.close()
-      self.viewer = None
+        # Edit the pole polygon vertex
+        pole = self._pole_geom
+
+        l, r, t, b = -polewidth/2, polewidth/2, polelen-polewidth/2, -polewidth/2
+        pole.v = [(l, b), (l, t), (r, t), (r, b)]
+
+        x = self.state
+        cartx = x[0]*scale+screen_width/2.0
+        self.carttrans.set_translation(cartx, carty)
+        self.poletrans.set_rotation(-x[2])
+
+        return self.viewer.render(return_rgb_array=mode == 'rgb_array')
+
+    def close(self):
+        if self.viewer:
+            self.viewer.close()
+            self.viewer = None
