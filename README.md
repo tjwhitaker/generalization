@@ -28,11 +28,15 @@ tensorboard --logdir data/runs
 # TODO
 - Train and test single models at a time.
 - Implement NK Selection Policies
-- Implement training callback to save model checkpoints intelligently
+- Implement training callback to save model checkpoints
 - Implement Non-Markov Environments
 
-- Implement Recurrent Policies
-    - Only possible with these three algos: a2c acktr ppo
-    - Worth trying?
+- Look Into Recurrent Policies
+    - Only possible with: a2c acktr ppo
 
-- Test Layer Normalized Policies
+- Look into layer normalization
+    - Only Possible with: ddpg sac td3
+
+- Find good model params
+    - Need to have comparable results.
+    - Default params are great for some models, terrible for others

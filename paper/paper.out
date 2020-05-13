@@ -1,16 +1,10 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
-\BOOKMARK [1][-]{section.2}{Submission of papers to NeurIPS 2020}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Style}{section.2}% 3
-\BOOKMARK [2][-]{subsection.2.2}{Retrieval of style files}{section.2}% 4
-\BOOKMARK [1][-]{section.3}{General formatting instructions}{}% 5
-\BOOKMARK [1][-]{section.4}{Headings: first level}{}% 6
-\BOOKMARK [2][-]{subsection.4.1}{Headings: second level}{section.4}% 7
-\BOOKMARK [3][-]{subsubsection.4.1.1}{Headings: third level}{subsection.4.1}% 8
-\BOOKMARK [1][-]{section.5}{Citations, figures, tables, references}{}% 9
-\BOOKMARK [2][-]{subsection.5.1}{Citations within the text}{section.5}% 10
-\BOOKMARK [2][-]{subsection.5.2}{Footnotes}{section.5}% 11
-\BOOKMARK [2][-]{subsection.5.3}{Figures}{section.5}% 12
-\BOOKMARK [2][-]{subsection.5.4}{Tables}{section.5}% 13
-\BOOKMARK [1][-]{section.6}{Final instructions}{}% 14
-\BOOKMARK [1][-]{section.7}{Preparing PDF files}{}% 15
-\BOOKMARK [2][-]{subsection.7.1}{Margins in LaTeX}{section.7}% 16
+\BOOKMARK [1][-]{section.2}{Methods}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Training}{section.2}% 3
+\BOOKMARK [1][-]{section.3}{Results}{}% 4
+\BOOKMARK [2][-]{subsection.3.1}{Markovian Tasks}{section.3}% 5
+\BOOKMARK [3][-]{subsubsection.3.1.1}{Single Pole Cart Balancing}{subsection.3.1}% 6
+\BOOKMARK [3][-]{subsubsection.3.1.2}{Double Pole Cart Balancing}{subsection.3.1}% 7
+\BOOKMARK [2][-]{subsection.3.2}{Non-Markovian Tasks}{section.3}% 8
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Single Pole Cart Balancing}{subsection.3.2}% 9
+\BOOKMARK [3][-]{subsubsection.3.2.2}{Double Pole Cart Balancing}{subsection.3.2}% 10

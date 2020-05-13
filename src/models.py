@@ -15,7 +15,7 @@ def acktr(env):
 def ddpg(env):
     n_actions = env.action_space.shape[-1]
     action_noise = OrnsteinUhlenbeckActionNoise(
-        mean=np.zeros(n_actions), sigma=float(0.5) * np.ones(n_actions))
+        mean=np.zeros(n_actions), sigma=0.5 * np.ones(n_actions))
 
     return DDPG('MlpPolicy', env, verbose=0, action_noise=action_noise, tensorboard_log="./data/runs", seed=0)
 
@@ -31,7 +31,7 @@ def sac(env):
 def td3(env):
     n_actions = env.action_space.shape[-1]
     action_noise = OrnsteinUhlenbeckActionNoise(
-        mean=np.zeros(n_actions), sigma=float(0.5) * np.ones(n_actions))
+        mean=np.zeros(n_actions), sigma=0.5 * np.ones(n_actions))
 
     return TD3('MlpPolicy', env, verbose=0, action_noise=action_noise, tensorboard_log="./data/runs", seed=0)
 

@@ -1,6 +1,8 @@
 import argparse
 import tensorflow as tf
 
+from stable_baselines.common import make_vec_env
+
 from environments.singlepole import SinglePoleEnv
 from environments.doublepole import DoublePoleEnv
 from stable_baselines.common.vec_env import DummyVecEnv
