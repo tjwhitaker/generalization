@@ -50,7 +50,8 @@ class SinglePoleEnv(gym.Env):
             np.finfo(np.float32).max])
 
         # Spaces
-        self.action_space = spaces.Box(np.array([-1]), np.array([1]))
+        self.action_space = spaces.Box(
+            low=-1, high=1, shape=(1,), dtype=np.float32)
         self.observation_space = spaces.Box(
             -observation_threshold, observation_threshold, dtype=np.float32)
 

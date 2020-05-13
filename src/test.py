@@ -15,8 +15,8 @@ def test_models(env):
 
     # Visual Demo
     for m in models:
-        run_policy(m, env)
-        # generalization_test(m, env)
+        # run_policy(m, env)
+        generalization_test(m, env)
 
 
 def run_policy(model, env):
