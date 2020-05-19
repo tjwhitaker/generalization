@@ -32,7 +32,7 @@ def ppo(env):
 
 # ???
 def sac(env):
-    return SAC('MlpPolicy', env, learning_starts=10000, verbose=1, tensorboard_log="./data/runs", seed=0)
+    return SAC('MlpPolicy', env, verbose=1, tensorboard_log="./data/runs", seed=0)
 
 
 # ???

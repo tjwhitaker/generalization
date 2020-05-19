@@ -6,7 +6,7 @@ from stable_baselines.common.callbacks import EvalCallback, StopTrainingOnReward
 
 def train_models(env, vecenv):
     callback_on_best = StopTrainingOnRewardThreshold(
-        reward_threshold=1000, verbose=1)
+        reward_threshold=4750, verbose=1)
     early_stop = EvalCallback(
         env, callback_on_new_best=callback_on_best, verbose=1)
 
