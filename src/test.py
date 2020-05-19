@@ -16,8 +16,8 @@ def test_models(env):
 
     # Visual Demo
     for m in models:
-        run_policy(m, env)
-        # generalization_test(m, env)
+        # run_policy(m, env)
+        generalization_test(m, env)
 
 
 def run_policy(model, env):
@@ -54,6 +54,8 @@ def generalization_test(model, env):
 
                     # Run test(policy)
                     success_flag = True
+
+                    env.reset()
                     observation = env.reset_to_state(state)
 
                     for i in range(1000):

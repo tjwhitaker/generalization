@@ -13,8 +13,7 @@ def register_env(id, entry_point, force=True):
     register(
         id=id,
         entry_point=entry_point,
-        max_episode_steps=5000,
-        reward_threshold=4950.0,
+        max_episode_steps=1000,
     )
 
 
