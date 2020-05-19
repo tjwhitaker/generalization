@@ -1,0 +1,8 @@
+Single Pole MLP: [64, 64]
+A2C,404
+ACKTR,488
+DDPG,
+PPO,517
+SAC,
+TD3,
+TRPO,

@@ -53,11 +53,11 @@ class SinglePoleEnv(gym.Env):
         self.action_space = spaces.Box(
             low=-1, high=1, shape=(1,), dtype=np.float32)
         self.observation_space = spaces.Box(
-            -observation_threshold, observation_threshold, dtype=np.float32)
+            low=-observation_threshold, high=observation_threshold, dtype=np.float32)
 
         # State Dynamics
-        # [x, dx, theta1, dtheta1, theta2, dtheta2]
-        # [dx, ddx, dtheta1, ddtheta1, dtheta2, ddtheta2]
+        # [x, dx, theta, dtheta]
+        # [dx, ddx, dtheta, ddtheta]
         self.state = np.zeros(4)
         self.dstate = np.zeros(4)
 
@@ -78,10 +78,10 @@ class SinglePoleEnv(gym.Env):
             self.pole_friction * state[3]) / (self.pole_1_mass * self.pole_1_length)) / self.pole_1_length
 
     def runge_kutta(self, force, state, dstate):
-        u1 = np.zeros(6)
-        u2 = np.zeros(6)
-        u3 = np.zeros(6)
-        u4 = np.zeros(6)
+        u1 = np.zeros(4)
+        u2 = np.zeros(4)
+        u3 = np.zeros(4)
+        u4 = np.zeros(4)
         state_temp = np.zeros(4)
         dstate_temp = np.zeros(4)
 
@@ -147,28 +147,19 @@ class SinglePoleEnv(gym.Env):
         else:
             reward = 0.0
 
-        return self.normalize_state(self.state), reward, done, {}
+        return self.state, reward, done, {}
 
     def reset(self):
         self.state = np.array([0, 0, 4.5 * (2 * np.pi) / 360, 0])
         self.dstate = np.zeros(4)
 
-        return self.normalize_state(self.state)
+        return self.state
 
     def reset_to_state(self, state):
         self.state = np.array(state)
         self.dstate = np.zeros(4)
 
-        return self.normalize_state(self.state)
-
-    def normalize_state(self, state):
-        max_theta = 36 * (2 * np.pi) / 360
-        x1 = 2 * ((state[0] + 2.4)/(4.8)) - 1
-        x2 = np.tanh(state[1])
-        x3 = 2 * ((state[2] + max_theta)/(2 * max_theta)) - 1
-        x4 = np.tanh(state[3])
-
-        return np.array([x1, x2, x3, x4])
+        return self.state
 
     def render(self, mode='human'):
         screen_width = 600
