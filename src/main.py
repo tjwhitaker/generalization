@@ -30,7 +30,7 @@ if __name__ == '__main__':
         env = DoublePoleEnv()
 
     # TODO: Make this cleaner. Some algos require vector environments while some don't.
-    vecenv = make_vec_env(SinglePoleEnv, n_envs=16,
+    vecenv = make_vec_env('SinglePole-v0', n_envs=16,
                           wrapper_class=NormalizeWrapper)
 
     # TODO: Allow finer control of model selection.

@@ -5,14 +5,13 @@ from stable_baselines import A2C, ACKTR, DDPG, PPO2, SAC, TD3, TRPO
 
 def test_models(env):
     # Load Models
-    models = [SAC.load('data/models/sac')]
-    #   A2C.load('data/models/a2c'),
-    #   ACKTR.load('data/models/acktr'),
-    #   DDPG.load('data/models/ddpg'),
-    #   PPO2.load('data/models/ppo'),
-    #   SAC.load('data/models/sac'),
-    #   TD3.load('data/models/td3'),
-    #   TRPO.load('data/models/trpo')]
+    models = [A2C.load('data/models/a2c'),
+              ACKTR.load('data/models/acktr'),
+              DDPG.load('data/models/ddpg'),
+              PPO2.load('data/models/ppo'),
+              SAC.load('data/models/sac'),
+              TD3.load('data/models/td3'),
+              TRPO.load('data/models/trpo')]
 
     # Visual Demo
     for m in models:

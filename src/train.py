@@ -5,43 +5,18 @@ from stable_baselines.common.callbacks import EvalCallback, StopTrainingOnReward
 
 
 def train_models(env, vecenv):
-    callback_on_best = StopTrainingOnRewardThreshold(
-        reward_threshold=4750, verbose=1)
-    early_stop = EvalCallback(
-        env, callback_on_new_best=callback_on_best, verbose=1)
+    algos = [{'name': 'a2c', 'model': a2c(vecenv)},
+             {'name': 'acktr', 'model': acktr(vecenv)},
+             {'name': 'ddpg', 'model': ddpg(env)},
+             {'name': 'ppo', 'model': ppo(vecenv)},
+             {'name': 'sac', 'model': sac(env)},
+             {'name': 'td3', 'model': td3(env)},
+             {'name': 'trpo', 'model': trpo(env)}]
 
-    # Set up models
-    # model = a2c(vecenv)
-    # model.learn(total_timesteps=5000000, callback=early_stop)
-    # model.save("data/models/a2c")
-    # tf.reset_default_graph()
+    for a in algos:
+        cb = StopTrainingOnRewardThreshold(reward_threshold=2000, verbose=1)
+        early_stop = EvalCallback(env, callback_on_new_best=cb, verbose=1)
 
-    # model = acktr(vecenv)
-    # model.learn(total_timesteps=5000000, callback=early_stop)
-    # model.save("data/models/acktr")
-    # tf.reset_default_graph()
-
-    # model = ddpg(env)
-    # model.learn(total_timesteps=1000000, callback=early_stop)
-    # model.save("data/models/ddpg")
-    # tf.reset_default_graph()
-
-    # model = ppo(vecenv)
-    # model.learn(total_timesteps=5000000, callback=early_stop)
-    # model.save("data/models/ppo")
-    # tf.reset_default_graph()
-
-    model = sac(env)
-    model.learn(total_timesteps=1000000, callback=early_stop)
-    model.save("data/models/sac")
-    tf.reset_default_graph()
-
-    # model = td3(env)
-    # model.learn(total_timesteps=1000000, callback=early_stop)
-    # model.save("data/models/td3")
-    # tf.reset_default_graph()
-
-    # model = trpo(env)
-    # model.learn(total_timesteps=1000000, callback=early_stop)
-    # model.save("data/models/trpo")
-    # tf.reset_default_graph()
+        a['model'].learn(total_timesteps=int(1e10), callback=early_stop)
+        a['model'].save(f'data/models/{a["name"]}')
+        tf.reset_default_graph()
