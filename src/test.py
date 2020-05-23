@@ -13,7 +13,6 @@ def test_models(env):
               TD3.load('data/models/td3'),
               TRPO.load('data/models/trpo')]
 
-    # Visual Demo
     for m in models:
         # run_policy(m, env)
         generalization_test(m, env)

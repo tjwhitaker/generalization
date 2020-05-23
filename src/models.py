@@ -5,44 +5,41 @@ from stable_baselines.common.noise import OrnsteinUhlenbeckActionNoise
 from stable_baselines import A2C, ACKTR, DDPG, PPO2, SAC, TD3, TRPO
 
 
-# Tuned
-def a2c(env):
-    return A2C('MlpPolicy', env, verbose=1, tensorboard_log="./data/runs", seed=0)
+def a2c(env, seed):
+    return A2C('MlpPolicy', env, verbose=1, tensorboard_log="./data/runs", seed=seed)
 
 
-# Tuned
-def acktr(env):
-    return ACKTR('MlpPolicy', env, verbose=1, tensorboard_log="./data/runs", seed=0)
+def acktr(env, seed):
+    return ACKTR('MlpPolicy', env, verbose=1, tensorboard_log="./data/runs", seed=seed)
 
 
-# Not Learning?
-def ddpg(env):
+def ddpg(env, seed):
     n_actions = env.action_space.shape[-1]
     action_noise = OrnsteinUhlenbeckActionNoise(
-        mean=np.zeros(n_actions), sigma=float(0.5) * np.ones(n_actions))
+        mean=np.zeros(n_actions), sigma=float(0.1) * np.ones(n_actions))
 
-    return DDPG('MlpPolicy', env, action_noise=action_noise, n_cpu_tf_sess=None, verbose=1, tensorboard_log="./data/runs", seed=0)
-
-
-# Tuned
-def ppo(env):
-    return PPO2('MlpPolicy', env, verbose=1, tensorboard_log="./data/runs", seed=0)
+    return DDPG('MlpPolicy', env, action_noise=action_noise, verbose=1, tensorboard_log="./data/runs", seed=seed)
 
 
-# ???
-def sac(env):
-    return SAC('MlpPolicy', env, verbose=1, tensorboard_log="./data/runs", seed=0)
+def ppo(env, seed):
+    return PPO2('MlpPolicy', env, verbose=1, tensorboard_log="./data/runs", seed=seed)
 
 
-# ???
-def td3(env):
+def sac(env, seed):
     n_actions = env.action_space.shape[-1]
     action_noise = OrnsteinUhlenbeckActionNoise(
-        mean=np.zeros(n_actions), sigma=float(0.5) * np.ones(n_actions))
+        mean=np.zeros(n_actions), sigma=float(0.1) * np.ones(n_actions))
 
-    return TD3('MlpPolicy', env, action_noise=action_noise, tensorboard_log="./data/runs", seed=0)
+    return SAC('MlpPolicy', env, action_noise=action_noise, verbose=1, tensorboard_log="./data/runs", seed=seed)
 
 
-# ???
-def trpo(env):
-    return TRPO('MlpPolicy', env, verbose=1, tensorboard_log="./data/runs", seed=0)
+def td3(env, seed):
+    n_actions = env.action_space.shape[-1]
+    action_noise = OrnsteinUhlenbeckActionNoise(
+        mean=np.zeros(n_actions), sigma=float(0.1) * np.ones(n_actions))
+
+    return TD3('MlpPolicy', env, action_noise=action_noise, verbose=1, tensorboard_log="./data/runs", seed=seed)
+
+
+def trpo(env, seed):
+    return TRPO('MlpPolicy', env, verbose=1, tensorboard_log="./data/runs", seed=seed)

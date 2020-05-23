@@ -13,7 +13,7 @@ def register_env(id, entry_point, force=True):
     register(
         id=id,
         entry_point=entry_point,
-        max_episode_steps=2000,
+        max_episode_steps=5000,
     )
 
 

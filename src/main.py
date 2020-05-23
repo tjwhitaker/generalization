@@ -27,7 +27,7 @@ if __name__ == '__main__':
         # env = NormalizeWrapper(SinglePoleEnv())
         env = NormalizeWrapper(gym.make('SinglePole-v0'))
     elif args.env == 'double':
-        env = DoublePoleEnv()
+        env = NormalizeWrapper(gym.make('DoublePole-v0'))
 
     # TODO: Make this cleaner. Some algos require vector environments while some don't.
     vecenv = make_vec_env('SinglePole-v0', n_envs=16,
