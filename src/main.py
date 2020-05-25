@@ -14,7 +14,7 @@ from environments.wrappers import NormalizeWrapper
 from stable_baselines.common.vec_env import DummyVecEnv
 
 from train import train_models
-from test import test_models
+from test import test_models, prune_policy
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -38,4 +38,5 @@ if __name__ == '__main__':
     if args.action == 'train':
         train_models(env, vecenv)
     elif args.action == 'test':
-        test_models(env)
+        # test_models(env)
+        prune_policy()
