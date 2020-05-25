@@ -4,18 +4,21 @@ from stable_baselines import A2C, ACKTR, DDPG, PPO2, SAC, TD3, TRPO
 
 
 def test_models(env):
-    # Load Models
-    models = [A2C.load('data/models/a2c'),
-              ACKTR.load('data/models/acktr'),
-              DDPG.load('data/models/ddpg'),
-              PPO2.load('data/models/ppo'),
-              SAC.load('data/models/sac'),
-              TD3.load('data/models/td3'),
-              TRPO.load('data/models/trpo')]
+    seeds = [1, 2, 3]
 
-    for m in models:
-        # run_policy(m, env)
-        generalization_test(m, env)
+    for s in seeds:
+        # Load Models
+        models = [A2C.load(f'data/models/a2c_{s}'),
+                  ACKTR.load(f'data/models/acktr_{s}'),
+                  DDPG.load(f'data/models/ddpg_{s}'),
+                  PPO2.load(f'data/models/ppo_{s}'),
+                  SAC.load(f'data/models/sac_{s}'),
+                  TD3.load(f'data/models/td3_{s}'),
+                  TRPO.load(f'data/models/trpo_{s}')]
+
+        for m in models:
+            # run_policy(m, env)
+            generalization_test(m, env)
 
 
 def run_policy(model, env):

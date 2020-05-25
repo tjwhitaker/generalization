@@ -6,7 +6,7 @@ from stable_baselines.common.callbacks import EvalCallback, StopTrainingOnReward
 
 
 def train_models(env, vecenv):
-    seeds = [0, 7, 42]
+    seeds = [1, 2, 3]
 
     for seed in seeds:
         algos = [{'name': 'a2c', 'model': a2c(vecenv, seed)},

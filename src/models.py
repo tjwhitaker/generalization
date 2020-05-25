@@ -6,7 +6,7 @@ from stable_baselines import A2C, ACKTR, DDPG, PPO2, SAC, TD3, TRPO
 
 
 def a2c(env, seed):
-    return A2C('MlpPolicy', env, verbose=1, tensorboard_log="./data/runs", seed=seed)
+    return A2C('MlpPolicy', env, learning_rate=0.001, verbose=1, tensorboard_log="./data/runs", seed=seed)
 
 
 def acktr(env, seed):
@@ -22,7 +22,7 @@ def ddpg(env, seed):
 
 
 def ppo(env, seed):
-    return PPO2('MlpPolicy', env, verbose=1, tensorboard_log="./data/runs", seed=seed)
+    return PPO2('MlpPolicy', env, learning_rate=0.001, verbose=1, tensorboard_log="./data/runs", seed=seed)
 
 
 def sac(env, seed):
@@ -30,7 +30,7 @@ def sac(env, seed):
     action_noise = OrnsteinUhlenbeckActionNoise(
         mean=np.zeros(n_actions), sigma=float(0.1) * np.ones(n_actions))
 
-    return SAC('MlpPolicy', env, action_noise=action_noise, verbose=1, tensorboard_log="./data/runs", seed=seed)
+    return SAC('MlpPolicy', env, learning_rate=0.001, action_noise=action_noise, verbose=1, tensorboard_log="./data/runs", seed=seed)
 
 
 def td3(env, seed):
@@ -38,8 +38,8 @@ def td3(env, seed):
     action_noise = OrnsteinUhlenbeckActionNoise(
         mean=np.zeros(n_actions), sigma=float(0.1) * np.ones(n_actions))
 
-    return TD3('MlpPolicy', env, action_noise=action_noise, verbose=1, tensorboard_log="./data/runs", seed=seed)
+    return TD3('MlpPolicy', env, learning_rate=0.001, action_noise=action_noise, verbose=1, tensorboard_log="./data/runs", seed=seed)
 
 
 def trpo(env, seed):
-    return TRPO('MlpPolicy', env, verbose=1, tensorboard_log="./data/runs", seed=seed)
+    return TRPO('MlpPolicy', env, vf_iters=5, vf_stepsize=0.001, verbose=1, tensorboard_log="./data/runs", seed=seed)
