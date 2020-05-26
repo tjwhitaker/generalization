@@ -38,5 +38,4 @@ if __name__ == '__main__':
     if args.action == 'train':
         train_models(env, vecenv)
     elif args.action == 'test':
-        # test_models(env)
-        prune_policy()
+        test_models(env)

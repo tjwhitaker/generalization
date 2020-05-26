@@ -1,27 +1,33 @@
 import numpy as np
 import tensorflow as tf
+from random import random
 from stable_baselines import A2C, ACKTR, DDPG, PPO2, SAC, TD3, TRPO
 
 
 def test_models(env):
-    seeds = [1, 2, 3]
+    # seeds = [1, 2, 3]
+    seeds = [3]
 
     for s in seeds:
         # Load Models
-        models = [A2C.load(f'data/models/a2c_{s}'),
-                  ACKTR.load(f'data/models/acktr_{s}'),
-                  DDPG.load(f'data/models/ddpg_{s}'),
-                  PPO2.load(f'data/models/ppo_{s}'),
-                  SAC.load(f'data/models/sac_{s}'),
-                  TD3.load(f'data/models/td3_{s}'),
-                  TRPO.load(f'data/models/trpo_{s}')]
+        # models = [A2C.load(f'data/models/a2c_{s}'),
+        #           ACKTR.load(f'data/models/acktr_{s}'),
+        #           DDPG.load(f'data/models/ddpg_{s}'),
+        #           PPO2.load(f'data/models/ppo_{s}'),
+        #           SAC.load(f'data/models/sac_{s}'),
+        #           TD3.load(f'data/models/td3_{s}'),
+        #           TRPO.load(f'data/models/trpo_{s}')]
+
+        models = [DDPG.load(f'data/models/ddpg_{s}')]
 
         for m in models:
             # run_policy(m, env)
+            # generalization_test(m, env)
+            prune_policy(m, 0.5)
             generalization_test(m, env)
 
 
-def prune_policy():
+def prune_policy(model, probability):
     # model = A2C.load('data/models/a2c_1')
     # model = ACKTR.load(f'data/models/acktr_1')
     # model = DDPG.load(f'data/models/ddpg_1')  # Different params
@@ -30,7 +36,7 @@ def prune_policy():
     # model = TD3.load(f'data/models/td3_1')
     # model = TRPO.load(f'data/models/trpo_1')
 
-    # params = model.get_parameters()
+    params = model.get_parameters()
     # print(params.keys())
 
     # Policy network parameters: A2C, ACKTR, PPO, TRPO
@@ -47,6 +53,58 @@ def prune_policy():
     # print(np.shape(params['model/pi/fc0/kernel:0']))  # 4x64
     # print(np.shape(params['model/pi/fc1/kernel:0']))  # 64x64
     # print(np.shape(params['model/pi/dense/kernel:0']))   # 64x1
+
+    # A2C, ACKTR, PPO, TRPO
+    # for i in range(params['model/pi_fc0/w:0'].shape[0]):
+    #     for j in range(params['model/pi_fc0/w:0'].shape[1]):
+    #         if random() < probability:
+    #             params['model/pi_fc0/w:0'][i, j] = 0
+
+    # for i in range(params['model/pi_fc1/w:0'].shape[0]):
+    #     for j in range(params['model/pi_fc1/w:0'].shape[1]):
+    #         if random() < probability:
+    #             params['model/pi_fc1/w:0'][i, j] = 0
+
+    # for i in range(params['model/pi/w:0'].shape[0]):
+    #     for j in range(params['model/pi/w:0'].shape[1]):
+    #         if random() < probability:
+    #             params['model/pi/w:0'][i, j] = 0
+
+    # SAC, TD3
+    # for i in range(params['model/pi/fc0/kernel:0'].shape[0]):
+    #     for j in range(params['model/pi/fc0/kernel:0'].shape[1]):
+    #         if random() < probability:
+    #             params['model/pi/fc0/kernel:0'][i, j] = 0
+
+    # for i in range(params['model/pi/fc1/kernel:0'].shape[0]):
+    #     for j in range(params['model/pi/fc1/kernel:0'].shape[1]):
+    #         if random() < probability:
+    #             params['model/pi/fc1/kernel:0'][i, j] = 0
+
+    # for i in range(params['model/pi/dense/kernel:0'].shape[0]):
+    #     for j in range(params['model/pi/dense/kernel:0'].shape[1]):
+    #         if random() < probability:
+    #             params['model/pi/dense/kernel:0'][i, j] = 0
+
+    # DDPG
+    for i in range(params['model/pi/fc0/kernel:0'].shape[0]):
+        for j in range(params['model/pi/fc0/kernel:0'].shape[1]):
+            if random() < probability:
+                params['model/pi/fc0/kernel:0'][i, j] = 0
+
+    for i in range(params['model/pi/fc1/kernel:0'].shape[0]):
+        for j in range(params['model/pi/fc1/kernel:0'].shape[1]):
+            if random() < probability:
+                params['model/pi/fc1/kernel:0'][i, j] = 0
+
+    for i in range(params['model/pi/pi/kernel:0'].shape[0]):
+        for j in range(params['model/pi/pi/kernel:0'].shape[1]):
+            if random() < probability:
+                params['model/pi/pi/kernel:0'][i, j] = 0
+
+    model.load_parameters(params)
+
+    return model
 
 
 def run_policy(model, env):
