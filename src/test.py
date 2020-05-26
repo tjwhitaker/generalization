@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from stable_baselines import A2C, ACKTR, DDPG, PPO2, SAC, TD3, TRPO
+from experiments import prune_policy
 
 # TODO: Refactor all of the pruning logic
 
@@ -23,9 +24,8 @@ def test_models(env):
 
         for m in models:
             # run_policy(m, env)
-            # generalization_test(m, env)
             prune_policy(m, 0.1)
-            generalization_test(m, env)
+            # generalization_test(m, env)
 
 
 def run_policy(model, env):
