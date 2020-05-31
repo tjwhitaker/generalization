@@ -1,0 +1,13 @@
+PPO
+64x64, 542
+8x8, 498
+8x8, 328
+8x8, 5
+8x8, 444
+8x8, 128
+8x8, 533
+8x8, 263
+8x8, 463
+Mean Ensemble: 517
+Mean Ensemble Drop Outliers(> STD 2): 574
+Mean Ensemble Drop Outliers(> STD 1.5): 572

@@ -13,6 +13,8 @@ from environments.doublepole import DoublePoleEnv
 from environments.wrappers import NormalizeWrapper
 from stable_baselines.common.vec_env import DummyVecEnv
 
+from experiments import ensemble_experiment, ensemble_test
+
 from train import train_models
 from test import test_models
 
@@ -35,7 +37,10 @@ if __name__ == '__main__':
 
     # TODO: Allow finer control of model selection.
     # Train or Test All Models
-    if args.action == 'train':
-        train_models(env, vecenv)
-    elif args.action == 'test':
-        test_models(env)
+    # if args.action == 'train':
+    #     train_models(env, vecenv)
+    # elif args.action == 'test':
+    #     test_models(env)
+
+    # ensemble_experiment(vecenv, env)
+    ensemble_test(env)

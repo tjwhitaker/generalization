@@ -1,14 +1,14 @@
 import numpy as np
 import tensorflow as tf
 from stable_baselines import A2C, ACKTR, DDPG, PPO2, SAC, TD3, TRPO
-from experiments import prune_policy
+# from experiments import prune_policy
 
 # TODO: Refactor all of the pruning logic
 
 
 def test_models(env):
     # seeds = [1, 2, 3]
-    seeds = [3]
+    seeds = [1]
 
     for s in seeds:
         # Load Models
@@ -20,12 +20,18 @@ def test_models(env):
         #           TD3.load(f'data/models/td3_{s}'),
         #           TRPO.load(f'data/models/trpo_{s}')]
 
-        models = [DDPG.load(f'data/models/ddpg_{s}')]
+        models = [PPO2.load(f'data/models/ppo_{s}'), SAC.load(f'data/models/sac_{s}'), TD3.load(
+            f'data/models/td3_{s}'), TRPO.load(f'data/models/trpo_{s}')]
 
         for m in models:
             # run_policy(m, env)
-            prune_policy(m, 0.1)
-            # generalization_test(m, env)
+            og_params = m.get_parameters()
+            generalization_test(m, env)
+
+            for i in range(50):
+                params = prune_policy(m.__class__.__name__, og_params, 0.1)
+                m.load_parameters(params)
+                generalization_test(m, env)
 
 
 def run_policy(model, env):
@@ -77,5 +83,5 @@ def generalization_test(model, env):
                     if success_flag:
                         score = score + 1
 
-    print(score)
+    print(f'{model.__class__.__name__} {score}')
     tf.reset_default_graph()
